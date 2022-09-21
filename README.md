@@ -1,4 +1,4 @@
-# Abavilla FPI SMS Project
+# Abavilla FPI Login API Project
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
