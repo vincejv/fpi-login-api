@@ -1,0 +1,44 @@
+quarkus:
+  http:
+    port: ${PORT:8080}
+  mongodb:
+    connection-string:
+      ${MONGO_CONN_STRING:mongodb://localhost}
+    database: vbl
+# Your configuration properties
+  rest-client:
+    m360-api:
+      url: https://api.m360.com.ph/v3/api/broadcast
+      #url: https://localhost
+      scope: javax.inject.Singleton
+  oidc:
+    auth-server-url: ${OIDC_AUTH_URL:https://localhost:8543/realms/quarkus}
+    client-id: ${OIDC_CLIENT_ID:backend-api}
+    credentials:
+      secret: ${OIDC_SECRET:AABBCC}
+    tls:
+      verification: none
+  keycloak:
+    policy-enforcer:
+      enable: true
+      paths:
+        '1':
+          path: /fpi/login/*
+          enforcement-mode: DISABLED
+        '2':
+          path: /fpi/sms/dlr/*
+          enforcement-mode: DISABLED
+
+fpi:
+  webhook:
+    dlr:
+      api-key: ${FPI_DLR_WEBHOOK_KEY:FPIDLRAABBBDDCCCQQQ}
+    mo:
+      api-key: ${FPI_MO_WEBHOOK_KEY:FPIDLRAABBBDDCCCQQQ}
+
+ph:
+  com:
+    m360:
+      api-key: ${SMS_API_KEY:123456789}
+      api-secret: ${SMS_SECRET:123456789}
+      sender-id: ${SMS_SID:ABCDE}
