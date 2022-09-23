@@ -1,4 +1,17 @@
 steps:
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - -c
+      - |
+        on_going_build=($(gcloud builds list --ongoing --format='value(id)' --filter="substitutions._TRIGGER_ID=$_TRIGGER_ID" | xargs))
+        for (( i=0; i<${#on_going_build[@]}; i++ )); do
+          if [ "$i" -gt "0" ]; then # skip current
+            echo "Cancelling build ${on_going_build[i]}"
+            gcloud builds cancel --no-user-output-enabled ${on_going_build[i]}
+          fi
+        done
+    id: "Cancel ongoing builds"
+    entrypoint: 'bash'
   - name: gcr.io/cloud-builders/docker
     args:
       - build
@@ -10,12 +23,12 @@ steps:
       - .
       - '-f'
       - Dockerfile
-    id: Build
+    id: "Build docker image"
   - name: gcr.io/cloud-builders/docker
     args:
       - push
       - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
-    id: Push
+    id: "Push to registry"
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     args:
       - run
@@ -34,7 +47,7 @@ steps:
       - '--memory=384Mi'
       - '--region=$_DEPLOY_REGION'
       - '--quiet'
-    id: Deploy
+    id: "Deploy to cloud run"
     entrypoint: gcloud
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     args:
@@ -45,7 +58,7 @@ steps:
       - '--member=allUsers'
       - '--role=roles/run.invoker'
       - '--region=$_DEPLOY_REGION'
-    id: Configure
+    id: "Configure cloud run"
     entrypoint: gcloud
 images:
   - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
