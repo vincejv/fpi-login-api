@@ -32,7 +32,6 @@ steps:
         --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID,$_LABELS
       - '--cpu=1000m'
       - '--memory=384Mi'
-      - '--execution-environment=gen1'
       - '--region=$_DEPLOY_REGION'
       - '--quiet'
     id: Deploy
