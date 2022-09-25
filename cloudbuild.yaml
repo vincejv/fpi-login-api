@@ -63,6 +63,6 @@ steps:
 images:
   - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
 options:
-  machineType: E2_HIGHCPU_8
+  machineType: UNSPECIFIED
   substitutionOption: ALLOW_LOOSE
 timeout: "7200s"
