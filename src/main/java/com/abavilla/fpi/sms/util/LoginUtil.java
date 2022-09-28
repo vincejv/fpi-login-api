@@ -16,33 +16,59 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.     *
  ******************************************************************************/
 
-package com.abavilla.fpi.sms;
+package com.abavilla.fpi.sms.util;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import java.security.SecureRandom;
 
-import com.abavilla.fpi.fw.FPIApplication;
-import com.abavilla.fpi.sms.util.LoginUtil;
+import javax.annotation.PostConstruct;
+import javax.inject.Singleton;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
+import at.favre.lib.crypto.bcrypt.LongPasswordStrategies;
 
 /**
- * Application starting point
+ * Utility methods used by the Login API service
  *
  * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
  */
-@ApplicationScoped
-public class FPILoginApplication extends FPIApplication {
+@Singleton
+public class LoginUtil {
 
   /**
-   * Utility method used by Login API Service
+   * BCrypt hasher
    */
-  @Inject
-  LoginUtil loginUtil;
+  private static BCrypt.Hasher bcrypt;
+
+  private static BCrypt.Verifyer verifyer;
 
   /**
-   * {@inheritDoc}
+   * Exponential cost (log2 factor) between {@link BCrypt#MIN_COST}
+   * and {@link BCrypt#MAX_COST} e.g. 12 --&gt; 2^12 = 4,096 iterations
    */
-  @Override
-  public void postStart() {
-    loginUtil.init();
+  private final static int BCRYPT_HASH_COST = 10;
+
+  /**
+   * Initialize utility library.
+   */
+  @PostConstruct
+  public void init() {
+    var bcryptVersion = BCrypt.Version.VERSION_2Y;
+    var strategy = LongPasswordStrategies.strict(bcryptVersion);
+    bcrypt = BCrypt.with(bcryptVersion, new SecureRandom(), strategy);
+    verifyer = BCrypt.verifyer(bcryptVersion, strategy);
+  }
+
+  /**
+   * Hashes password with BCrypt
+   *
+   * @param password Unhashed password
+   * @return Hash password
+   */
+  public static char[] hashPassword(char[] password) {
+    return bcrypt.hashToChar(BCRYPT_HASH_COST, password);
+  }
+
+  public static boolean verifyHash(char[] password, char[] hash) {
+    return verifyer.verifyStrict(password, hash).verified;
   }
 }

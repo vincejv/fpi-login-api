@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.NotAuthorizedException;
 
 import com.abavilla.fpi.fw.service.AbsSvc;
 import com.abavilla.fpi.sms.dto.LoginDto;
@@ -31,14 +32,36 @@ import com.abavilla.fpi.sms.dto.SessionDto;
 import com.abavilla.fpi.sms.entity.Session;
 import com.abavilla.fpi.sms.mapper.SessionMapper;
 import com.abavilla.fpi.sms.repo.SessionRepo;
+import com.abavilla.fpi.sms.util.LoginConst;
+import com.abavilla.fpi.sms.util.LoginUtil;
 import io.smallrye.mutiny.Uni;
 import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.util.HttpResponseException;
+import org.keycloak.representations.AccessTokenResponse;
+
+/**
+ * Service layer for creating and managing login sessions.
+ *
+ * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
+ */
 @ApplicationScoped
 public class LoginSvc extends AbsSvc<SessionDto, Session> {
+
+  /**
+   * Advance repo for operating in {@link Session} entities.
+   */
   @Inject
   SessionRepo advRepo;
+
+  /**
+   * Client used for authorizing with Keycloak server.
+   */
   @Inject
   AuthzClient authzClient;
+
+  /**
+   * DTO to Entity mapper for {@link Session}
+   */
   @Inject
   SessionMapper mapper;
 
@@ -52,26 +75,51 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
     Uni<Optional<Session>> byUsername = advRepo.findByUsername(login.getUsername());
     return byUsername.chain(session -> {
       if (session.isEmpty()) {
-        var auth = authzClient.obtainAccessToken(login.getUsername(), login.getPassword());
+        AccessTokenResponse auth = null;
+
+        try {
+          auth = authzClient.obtainAccessToken(login.getUsername(), login.getPassword());
+        } catch (HttpResponseException ex) {
+          return Uni.createFrom().failure(
+              new NotAuthorizedException(LoginConst.INVALID_USER_CREDENTIALS));
+        }
+
         Session newSession = new Session();
         newSession.setUsername(login.getUsername());
+        newSession.setPassword(LoginUtil.hashPassword(
+            login.getPassword().toCharArray()));
         newSession.setAccessToken(auth.getToken());
         newSession.setRefreshToken(auth.getRefreshToken());
         newSession.setDateCreated(LocalDateTime.now(ZoneOffset.UTC));
         newSession.setIpAddress(login.getRemoteAddress());
         newSession.setUserAgent(login.getUserAgent());
         return repo.persist(newSession);
+      } else if (LoginUtil.verifyHash(login.getPassword().toCharArray(),
+          session.get().getPassword())) {
+        return Uni.createFrom().item(session.get());
+      } else {
+        return Uni.createFrom().failure(
+            new NotAuthorizedException(LoginConst.INVALID_USER_CREDENTIALS));
       }
-      return Uni.createFrom().item(session.get());
     }).map(this::mapToDto);
   }
 
   public Uni<SessionDto> refreshToken(LoginDto login) {
     Uni<Optional<Session>> byUsername = advRepo.findByUsername(login.getUsername());
     return byUsername.chain(session -> {
-      var auth = authzClient.obtainAccessToken(login.getUsername(), login.getPassword());
+      AccessTokenResponse auth = null;
+
+      try {
+        auth = authzClient.obtainAccessToken(login.getUsername(), login.getPassword());
+      } catch (HttpResponseException ex) {
+        return Uni.createFrom().failure(
+            new NotAuthorizedException(LoginConst.INVALID_USER_CREDENTIALS));
+      }
+
       Session newSession = session.orElse(new Session());
       newSession.setUsername(login.getUsername());
+      newSession.setPassword(LoginUtil.hashPassword(
+          login.getPassword().toCharArray()));
       newSession.setAccessToken(auth.getToken());
       newSession.setRefreshToken(auth.getRefreshToken());
       newSession.setDateCreated(LocalDateTime.now(ZoneOffset.UTC));
@@ -81,11 +129,17 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
     }).map(this::mapToDto);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SessionDto mapToDto(Session entity) {
     return mapper.mapToDto(entity);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Session mapToEntity(SessionDto dto) {
     return mapper.mapToEntity(dto);

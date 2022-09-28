@@ -16,33 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.     *
  ******************************************************************************/
 
-package com.abavilla.fpi.sms;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import com.abavilla.fpi.fw.FPIApplication;
-import com.abavilla.fpi.sms.util.LoginUtil;
+package com.abavilla.fpi.sms.util;
 
 /**
- * Application starting point
- *
- * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
+ * Constants used for Login API Service.
  */
-@ApplicationScoped
-public class FPILoginApplication extends FPIApplication {
-
-  /**
-   * Utility method used by Login API Service
-   */
-  @Inject
-  LoginUtil loginUtil;
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void postStart() {
-    loginUtil.init();
-  }
+public abstract class LoginConst {
+  public static final String INVALID_USER_CREDENTIALS = "Invalid user credentials";
 }

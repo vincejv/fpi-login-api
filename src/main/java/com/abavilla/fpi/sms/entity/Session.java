@@ -43,6 +43,11 @@ public class Session extends AbsMongoItem {
   private String username;
 
   /**
+   * Hashed password to verify the credentials
+   */
+  private char[] password;
+
+  /**
    * Token used to refresh an expired access token
    */
   private String refreshToken;
