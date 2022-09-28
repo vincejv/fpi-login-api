@@ -25,6 +25,7 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.Mappings;
 
 /**
  * Mapper used for converting between {@link SessionDto} and {@link Session} entity
@@ -35,11 +36,17 @@ import org.mapstruct.MappingConstants;
     injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface SessionMapper extends IDtoToEntityMapper<SessionDto, Session> {
 
-  @Mapping(target = "dateCreated", ignore = true)
-  @Mapping(target = "dateUpdated", ignore = true)
+  @Mappings(value = {
+      @Mapping(target = "dateCreated", ignore = true),
+      @Mapping(target = "dateUpdated", ignore = true),
+      @Mapping(target = "id", ignore = true)
+  })
   SessionDto mapToDto(Session entity);
 
-  @Mapping(target = "dateCreated", ignore = true)
-  @Mapping(target = "dateUpdated", ignore = true)
+  @Mappings(value = {
+      @Mapping(target = "dateCreated", ignore = true),
+      @Mapping(target = "dateUpdated", ignore = true),
+      @Mapping(target = "id", ignore = true)
+  })
   Session mapToEntity(SessionDto dto);
 }
