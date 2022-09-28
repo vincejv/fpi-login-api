@@ -39,13 +39,16 @@ public class LoginUtil {
    */
   private static BCrypt.Hasher bcrypt;
 
-  private static BCrypt.Verifyer verifyer;
+  /**
+   * BCrypt verifier
+   */
+  private static BCrypt.Verifyer verifier;
 
   /**
    * Exponential cost (log2 factor) between {@link BCrypt#MIN_COST}
    * and {@link BCrypt#MAX_COST} e.g. 12 --&gt; 2^12 = 4,096 iterations
    */
-  private final static int BCRYPT_HASH_COST = 10;
+  private final static int BCRYPT_HASH_COST = BCrypt.MIN_COST;
 
   /**
    * Initialize utility library.
@@ -55,7 +58,7 @@ public class LoginUtil {
     var bcryptVersion = BCrypt.Version.VERSION_2Y;
     var strategy = LongPasswordStrategies.strict(bcryptVersion);
     bcrypt = BCrypt.with(bcryptVersion, new SecureRandom(), strategy);
-    verifyer = BCrypt.verifyer(bcryptVersion, strategy);
+    verifier = BCrypt.verifyer(bcryptVersion, strategy);
   }
 
   /**
@@ -68,7 +71,14 @@ public class LoginUtil {
     return bcrypt.hashToChar(BCRYPT_HASH_COST, password);
   }
 
+  /**
+   * Checks if hash matches with password.
+   *
+   * @param password Password
+   * @param hash Hash
+   * @return {@code true} if a match otherwise {@code false}
+   */
   public static boolean verifyHash(char[] password, char[] hash) {
-    return verifyer.verifyStrict(password, hash).verified;
+    return verifier.verifyStrict(password, hash).verified;
   }
 }
