@@ -67,14 +67,14 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
 
   /**
    * Performs login, if existing session is detected, return currently established token.
-   * @param login {@link LoginDto} Object containing credentials
    *
+   * @param login {@link LoginDto} Object containing credentials
    * @return {@link SessionDto} Session information
    */
   public Uni<SessionDto> login(LoginDto login) {
     Uni<Optional<Session>> byUsername = advRepo.findByUsername(login.getUsername());
-    return byUsername.chain(session -> {
-      if (session.isEmpty()) {
+    return byUsername.chain(sessionOpt -> {
+      if (sessionOpt.isEmpty()) {
         AccessTokenResponse auth = null;
 
         try {
@@ -85,18 +85,11 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
         }
 
         Session newSession = new Session();
-        newSession.setUsername(login.getUsername());
-        newSession.setPassword(LoginUtil.hashPassword(
-            login.getPassword().toCharArray()));
-        newSession.setAccessToken(auth.getToken());
-        newSession.setRefreshToken(auth.getRefreshToken());
-        newSession.setDateCreated(LocalDateTime.now(ZoneOffset.UTC));
-        newSession.setIpAddress(login.getRemoteAddress());
-        newSession.setUserAgent(login.getUserAgent());
+        mapLoginToSession(newSession, login, auth);
         return repo.persist(newSession);
       } else if (LoginUtil.verifyHash(login.getPassword().toCharArray(),
-          session.get().getPassword())) {
-        return Uni.createFrom().item(session.get());
+          sessionOpt.get().getPassword())) {
+        return Uni.createFrom().item(sessionOpt.get());
       } else {
         return Uni.createFrom().failure(
             new NotAuthorizedException(LoginConst.INVALID_USER_CREDENTIALS));
@@ -104,9 +97,15 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
     }).map(this::mapToDto);
   }
 
+  /**
+   * Force to retrieve a new access token from authentication server.
+   *
+   * @param login Login credentials
+   * @return {@link SessionDto} object
+   */
   public Uni<SessionDto> refreshToken(LoginDto login) {
     Uni<Optional<Session>> byUsername = advRepo.findByUsername(login.getUsername());
-    return byUsername.chain(session -> {
+    return byUsername.chain(sessionOpt -> {
       AccessTokenResponse auth = null;
 
       try {
@@ -116,17 +115,28 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
             new NotAuthorizedException(LoginConst.INVALID_USER_CREDENTIALS));
       }
 
-      Session newSession = session.orElse(new Session());
-      newSession.setUsername(login.getUsername());
-      newSession.setPassword(LoginUtil.hashPassword(
-          login.getPassword().toCharArray()));
-      newSession.setAccessToken(auth.getToken());
-      newSession.setRefreshToken(auth.getRefreshToken());
-      newSession.setDateCreated(LocalDateTime.now(ZoneOffset.UTC));
-      newSession.setIpAddress(login.getRemoteAddress());
-      newSession.setUserAgent(login.getUserAgent());
-      return repo.persistOrUpdate(newSession);
+      Session session = sessionOpt.orElse(new Session());
+      mapLoginToSession(session, login, auth);
+      return repo.persistOrUpdate(session);
     }).map(this::mapToDto);
+  }
+
+  /**
+   * Creates a new {@link Session} from login credentials and authentication response.
+   *
+   * @param session Session to map
+   * @param login Login credentials
+   * @param auth Authentication response
+   */
+  private void mapLoginToSession(Session session, LoginDto login, AccessTokenResponse auth) {
+    session.setUsername(login.getUsername());
+    session.setPassword(LoginUtil.hashPassword(
+        login.getPassword().toCharArray()));
+    session.setAccessToken(auth.getToken());
+    session.setRefreshToken(auth.getRefreshToken());
+    session.setDateCreated(LocalDateTime.now(ZoneOffset.UTC));
+    session.setIpAddress(login.getRemoteAddress());
+    session.setUserAgent(login.getUserAgent());
   }
 
   /**
