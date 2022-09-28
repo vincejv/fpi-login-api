@@ -23,6 +23,7 @@ import io.quarkus.mongodb.panache.common.MongoEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 
 /**
  * Entity containing the information regarding the login session.
@@ -32,6 +33,7 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@BsonDiscriminator
 @MongoEntity(collection="login_sessions")
 public class Session extends AbsMongoItem {
 

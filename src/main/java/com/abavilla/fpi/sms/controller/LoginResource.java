@@ -21,18 +21,14 @@ package com.abavilla.fpi.sms.controller;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 
-import com.abavilla.fpi.fw.controller.AbsResource;
+import com.abavilla.fpi.fw.controller.AbsBaseResource;
 import com.abavilla.fpi.fw.util.HttpUtil;
 import com.abavilla.fpi.sms.dto.LoginDto;
 import com.abavilla.fpi.sms.dto.SessionDto;
 import com.abavilla.fpi.sms.entity.Session;
 import com.abavilla.fpi.sms.service.LoginSvc;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.http.HttpServerRequest;
 import org.apache.commons.lang3.BooleanUtils;
@@ -45,7 +41,7 @@ import org.jboss.resteasy.reactive.NoCache;
  * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
  */
 @Path("/fpi/login")
-public class LoginResource extends AbsResource<SessionDto, Session, LoginSvc> {
+public class LoginResource extends AbsBaseResource<SessionDto, Session, LoginSvc> {
 
   @Context
   HttpServerRequest request;
@@ -69,25 +65,4 @@ public class LoginResource extends AbsResource<SessionDto, Session, LoginSvc> {
       return service.refreshToken(loginDto);
   }
 
-  /**
-   * @deprecated Not implemented
-   * @throws WebApplicationException Not implemented
-   */
-  @Override
-  public Multi<SessionDto> getAll() {
-    throw new WebApplicationException(Response
-        .status(HttpResponseStatus.NOT_FOUND.code())
-        .build());
-  }
-
-  /**
-   * @deprecated Not implemented
-   * @throws WebApplicationException Not implemented
-   */
-  @Override
-  public Session save() {
-    throw new WebApplicationException(Response
-        .status(HttpResponseStatus.NOT_FOUND.code())
-        .build());
-  }
 }

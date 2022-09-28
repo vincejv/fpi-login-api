@@ -18,7 +18,7 @@
 
 package com.abavilla.fpi.sms.mapper;
 
-import com.abavilla.fpi.fw.mapper.IMapper;
+import com.abavilla.fpi.fw.mapper.IDtoToEntityMapper;
 import com.abavilla.fpi.sms.dto.SessionDto;
 import com.abavilla.fpi.sms.entity.Session;
 import org.mapstruct.InjectionStrategy;
@@ -33,7 +33,7 @@ import org.mapstruct.MappingConstants;
  */
 @Mapper(componentModel = MappingConstants.ComponentModel.CDI,
     injectionStrategy = InjectionStrategy.CONSTRUCTOR)
-public interface SessionMapper extends IMapper<SessionDto, Session> {
+public interface SessionMapper extends IDtoToEntityMapper<SessionDto, Session> {
 
   @Mapping(target = "dateCreated", ignore = true)
   @Mapping(target = "dateUpdated", ignore = true)
