@@ -136,7 +136,8 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
     session.setDateCreated(DateUtil.now());
     session.setIpAddress(login.getRemoteAddress());
     session.setUserAgent(login.getUserAgent());
-    session.setRefreshTokenExpiry(DateUtil.fromEpoch(auth.getExpiresIn()));
+    session.setRefreshTokenExpiry(DateUtil.now()
+        .plusSeconds(auth.getExpiresIn()));
   }
 
   /**
