@@ -57,7 +57,7 @@ public interface SessionMapper extends IDtoToEntityMapper<SessionDto, Session> {
 
   /**
    * Converts {@link java.time.LocalDateTime} to string using the format specified in
-   * {@link com.abavilla.fpi.fw.util.DateUtil#DEFAULT_TIMESTAMP_FORMAT}
+   * {@link com.abavilla.fpi.fw.util.DateUtil#DEFAULT_TIMESTAMP_FORMAT_WITH_TIMEZONE}
    */
   @Named("ldtToUtcStr")
   default String ldtToUtcStr(LocalDateTime ldt) {
