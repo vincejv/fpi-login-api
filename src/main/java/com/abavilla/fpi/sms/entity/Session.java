@@ -18,6 +18,8 @@
 
 package com.abavilla.fpi.sms.entity;
 
+import java.time.LocalDateTime;
+
 import com.abavilla.fpi.fw.entity.mongo.AbsMongoItem;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import lombok.Data;
@@ -56,6 +58,11 @@ public class Session extends AbsMongoItem {
    * Token used to authenticate to protected resource
    */
   private String accessToken;
+
+  /**
+   * Date and time when {@link #refreshToken} token will expire based from Keycloak server
+   */
+  private LocalDateTime refreshTokenExpiry;
 
   /**
    * IP Address of client who established the session

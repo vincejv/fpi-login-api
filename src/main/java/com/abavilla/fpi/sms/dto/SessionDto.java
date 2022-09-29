@@ -39,4 +39,9 @@ public class SessionDto extends AbsDto {
    * Token to be used for authenticating against protected resource
    */
   private String accessToken;
+
+  /**
+   * Date and time when token will expire in UTC time
+   */
+  private String tokenExpiry;
 }

@@ -43,6 +43,9 @@ import org.jboss.resteasy.reactive.NoCache;
 @Path("/fpi/login")
 public class LoginResource extends AbsBaseResource<SessionDto, Session, LoginSvc> {
 
+  /**
+   * Context for accessing the information about the HTTP Request, like IP Address, User-Agent and other headers.
+   */
   @Context
   HttpServerRequest request;
 

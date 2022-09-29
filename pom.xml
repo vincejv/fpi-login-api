@@ -22,12 +22,12 @@
   <parent>
     <groupId>com.abavilla</groupId>
     <artifactId>fpi-framework-pom</artifactId>
-    <version>1.0.52-RC</version>
+    <version>1.0.55-RC</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fpi-login-api</artifactId>
-  <version>1.0.5-RC</version>
+  <version>1.0.6-RC</version>
 
   <properties>
 

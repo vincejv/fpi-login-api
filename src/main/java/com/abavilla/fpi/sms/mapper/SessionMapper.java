@@ -18,7 +18,10 @@
 
 package com.abavilla.fpi.sms.mapper;
 
+import java.time.LocalDateTime;
+
 import com.abavilla.fpi.fw.mapper.IDtoToEntityMapper;
+import com.abavilla.fpi.fw.util.DateUtil;
 import com.abavilla.fpi.sms.dto.SessionDto;
 import com.abavilla.fpi.sms.entity.Session;
 import org.mapstruct.InjectionStrategy;
@@ -26,6 +29,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.Mappings;
+import org.mapstruct.Named;
 
 /**
  * Mapper used for converting between {@link SessionDto} and {@link Session} entity
@@ -39,7 +43,8 @@ public interface SessionMapper extends IDtoToEntityMapper<SessionDto, Session> {
   @Mappings(value = {
       @Mapping(target = "dateCreated", ignore = true),
       @Mapping(target = "dateUpdated", ignore = true),
-      @Mapping(target = "id", ignore = true)
+      @Mapping(target = "id", ignore = true),
+      @Mapping(target = "tokenExpiry", source = "refreshTokenExpiry", qualifiedByName = "ldtToUtcStr")
   })
   SessionDto mapToDto(Session entity);
 
@@ -49,4 +54,13 @@ public interface SessionMapper extends IDtoToEntityMapper<SessionDto, Session> {
       @Mapping(target = "id", ignore = true)
   })
   Session mapToEntity(SessionDto dto);
+
+  /**
+   * Converts {@link java.time.LocalDateTime} to string using the format specified in
+   * {@link com.abavilla.fpi.fw.util.DateUtil#DEFAULT_TIMESTAMP_FORMAT}
+   */
+  @Named("ldtToUtcStr")
+  default String ldtToUtcStr(LocalDateTime ldt) {
+    return DateUtil.convertLdtToStr(ldt);
+  }
 }

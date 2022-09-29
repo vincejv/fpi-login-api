@@ -18,8 +18,6 @@
 
 package com.abavilla.fpi.sms.service;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -27,6 +25,7 @@ import javax.inject.Inject;
 import javax.ws.rs.NotAuthorizedException;
 
 import com.abavilla.fpi.fw.service.AbsSvc;
+import com.abavilla.fpi.fw.util.DateUtil;
 import com.abavilla.fpi.sms.dto.LoginDto;
 import com.abavilla.fpi.sms.dto.SessionDto;
 import com.abavilla.fpi.sms.entity.Session;
@@ -134,9 +133,10 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
         login.getPassword().toCharArray()));
     session.setAccessToken(auth.getToken());
     session.setRefreshToken(auth.getRefreshToken());
-    session.setDateCreated(LocalDateTime.now(ZoneOffset.UTC));
+    session.setDateCreated(DateUtil.now());
     session.setIpAddress(login.getRemoteAddress());
     session.setUserAgent(login.getUserAgent());
+    session.setRefreshTokenExpiry(DateUtil.fromEpoch(auth.getExpiresIn()));
   }
 
   /**
