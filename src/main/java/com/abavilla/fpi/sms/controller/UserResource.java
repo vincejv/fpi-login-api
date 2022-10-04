@@ -23,6 +23,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
 import com.abavilla.fpi.fw.controller.AbsBaseResource;
+import com.abavilla.fpi.fw.dto.impl.RespDto;
+import com.abavilla.fpi.fw.exceptions.FPISvcEx;
 import com.abavilla.fpi.sms.dto.LoginDto;
 import com.abavilla.fpi.sms.dto.WebhookLoginDto;
 import com.abavilla.fpi.sms.entity.User;
@@ -30,6 +32,7 @@ import com.abavilla.fpi.sms.service.UserSvc;
 import io.smallrye.mutiny.Uni;
 import org.jboss.resteasy.reactive.NoCache;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
 /**
  * Resource for Login to FPI System without going through keycloak authentication server
@@ -47,6 +50,15 @@ public class UserResource extends AbsBaseResource<LoginDto, User, UserSvc> {
       WebhookLoginDto loginDto,
       @QueryParam("refreshToken")Boolean refreshToken){
     return service.authorizedLogin(loginDto);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @ServerExceptionMapper
+  protected RestResponse<RespDto<Object>> mapException(FPISvcEx x) {
+    return super.mapException(x);
   }
 
 }
