@@ -24,6 +24,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import com.abavilla.fpi.fw.controller.AbsBaseResource;
+import com.abavilla.fpi.fw.dto.impl.RespDto;
+import com.abavilla.fpi.fw.exceptions.FPISvcEx;
 import com.abavilla.fpi.fw.util.HttpUtil;
 import com.abavilla.fpi.sms.dto.LoginDto;
 import com.abavilla.fpi.sms.dto.PasswordLoginDto;
@@ -34,6 +36,8 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.core.http.HttpServerRequest;
 import org.apache.commons.lang3.BooleanUtils;
 import org.jboss.resteasy.reactive.NoCache;
+import org.jboss.resteasy.reactive.RestResponse;
+import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
 /**
  * Resource for Login to FPI System
@@ -67,6 +71,15 @@ public class LoginResource extends AbsBaseResource<LoginDto, Session, LoginSvc> 
       return service.login(loginDto);
     else
       return service.refreshToken(loginDto);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @ServerExceptionMapper
+  protected RestResponse<RespDto<Object>> mapException(FPISvcEx x) {
+    return super.mapException(x);
   }
 
 }
