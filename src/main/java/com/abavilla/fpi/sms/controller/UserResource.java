@@ -21,52 +21,32 @@ package com.abavilla.fpi.sms.controller;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 
 import com.abavilla.fpi.fw.controller.AbsBaseResource;
-import com.abavilla.fpi.fw.util.HttpUtil;
 import com.abavilla.fpi.sms.dto.LoginDto;
-import com.abavilla.fpi.sms.dto.PasswordLoginDto;
-import com.abavilla.fpi.sms.dto.SessionDto;
-import com.abavilla.fpi.sms.entity.Session;
-import com.abavilla.fpi.sms.service.LoginSvc;
+import com.abavilla.fpi.sms.dto.WebhookLoginDto;
+import com.abavilla.fpi.sms.entity.User;
+import com.abavilla.fpi.sms.service.UserSvc;
 import io.smallrye.mutiny.Uni;
-import io.vertx.core.http.HttpServerRequest;
-import org.apache.commons.lang3.BooleanUtils;
 import org.jboss.resteasy.reactive.NoCache;
+import org.jboss.resteasy.reactive.RestResponse;
 
 /**
- * Resource for Login to FPI System
+ * Resource for Login to FPI System without going through keycloak authentication server
  * URI Path: {@code "/fpi/login"}
  *
  * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
  */
 @Path("/fpi/login")
-public class LoginResource extends AbsBaseResource<LoginDto, Session, LoginSvc> {
+public class UserResource extends AbsBaseResource<LoginDto, User, UserSvc> {
 
-  /**
-   * Context for accessing the information about the HTTP Request, like IP Address, User-Agent and other headers.
-   */
-  @Context
-  HttpServerRequest request;
-
-  /**
-   * Endpoint to establish a new login session
-   * @param loginDto Credentials used for authentication
-   * @param refreshToken Flag to check if login will use a refresh token to refresh an expired access token
-   *
-   * @return {@link SessionDto} Session information
-   */
   @POST
   @NoCache
-  public Uni<SessionDto> login(PasswordLoginDto loginDto,
-                               @QueryParam("refreshToken")Boolean refreshToken){
-    loginDto.setUserAgent(HttpUtil.getUserAgent(request));
-    loginDto.setRemoteAddress(HttpUtil.getClientIpAddr(request));
-    if (refreshToken == null || BooleanUtils.isFalse(refreshToken))
-      return service.login(loginDto);
-    else
-      return service.refreshToken(loginDto);
+  @Path("trusted")
+  public Uni<RestResponse<Void>> loginFromTrustedIdentityProvider(
+      WebhookLoginDto loginDto,
+      @QueryParam("refreshToken")Boolean refreshToken){
+    return service.authorizedLogin(loginDto);
   }
 
 }

@@ -24,9 +24,10 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.NotAuthorizedException;
 
-import com.abavilla.fpi.fw.service.AbsSvc;
+import com.abavilla.fpi.fw.service.AbsRepoSvc;
 import com.abavilla.fpi.fw.util.DateUtil;
 import com.abavilla.fpi.sms.dto.LoginDto;
+import com.abavilla.fpi.sms.dto.PasswordLoginDto;
 import com.abavilla.fpi.sms.dto.SessionDto;
 import com.abavilla.fpi.sms.entity.Session;
 import com.abavilla.fpi.sms.mapper.SessionMapper;
@@ -44,13 +45,7 @@ import org.keycloak.representations.AccessTokenResponse;
  * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
  */
 @ApplicationScoped
-public class LoginSvc extends AbsSvc<SessionDto, Session> {
-
-  /**
-   * Advance repo for operating in {@link Session} entities.
-   */
-  @Inject
-  SessionRepo advRepo;
+public class LoginSvc extends AbsRepoSvc<LoginDto, Session, SessionRepo> {
 
   /**
    * Client used for authorizing with Keycloak server.
@@ -70,8 +65,8 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
    * @param login {@link LoginDto} Object containing credentials
    * @return {@link SessionDto} Session information
    */
-  public Uni<SessionDto> login(LoginDto login) {
-    Uni<Optional<Session>> byUsername = advRepo.findByUsername(login.getUsername());
+  public Uni<SessionDto> login(PasswordLoginDto login) {
+    Uni<Optional<Session>> byUsername = repo.findByUsername(login.getUsername());
     return byUsername.chain(sessionOpt -> {
       if (sessionOpt.isEmpty()) {
         AccessTokenResponse auth = null;
@@ -93,7 +88,7 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
         return Uni.createFrom().failure(
             new NotAuthorizedException(LoginConst.INVALID_USER_CREDENTIALS));
       }
-    }).map(this::mapToDto);
+    }).map(mapper::mapToDto);
   }
 
   /**
@@ -102,8 +97,8 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
    * @param login Login credentials
    * @return {@link SessionDto} object
    */
-  public Uni<SessionDto> refreshToken(LoginDto login) {
-    Uni<Optional<Session>> byUsername = advRepo.findByUsername(login.getUsername());
+  public Uni<SessionDto> refreshToken(PasswordLoginDto login) {
+    Uni<Optional<Session>> byUsername = repo.findByUsername(login.getUsername());
     return byUsername.chain(sessionOpt -> {
       AccessTokenResponse auth = null;
 
@@ -117,7 +112,7 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
       Session session = sessionOpt.orElse(new Session());
       mapLoginToSession(session, login, auth);
       return repo.persistOrUpdate(session);
-    }).map(this::mapToDto);
+    }).map(mapper::mapToDto);
   }
 
   /**
@@ -127,7 +122,7 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
    * @param login Login credentials
    * @param auth Authentication response
    */
-  private void mapLoginToSession(Session session, LoginDto login, AccessTokenResponse auth) {
+  private void mapLoginToSession(Session session, PasswordLoginDto login, AccessTokenResponse auth) {
     session.setUsername(login.getUsername());
     session.setPassword(LoginUtil.hashPassword(
         login.getPassword().toCharArray()));
@@ -140,19 +135,19 @@ public class LoginSvc extends AbsSvc<SessionDto, Session> {
         .plusSeconds(auth.getExpiresIn()));
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public SessionDto mapToDto(Session entity) {
-    return mapper.mapToDto(entity);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Session mapToEntity(SessionDto dto) {
-    return mapper.mapToEntity(dto);
-  }
+//  /**
+//   * {@inheritDoc}
+//   */
+//  @Override
+//  public SessionDto mapToDto(Session entity) {
+//    return mapper.mapToDto(entity);
+//  }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  @Override
+//  public Session mapToEntity(SessionDto dto) {
+//    return mapper.mapToEntity(dto);
+//  }
 }

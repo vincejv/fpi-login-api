@@ -16,33 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.     *
  ******************************************************************************/
 
-package com.abavilla.fpi.sms.config.codec;
+package com.abavilla.fpi.sms.repo;
 
-import com.abavilla.fpi.fw.config.codec.IEnumCodecProvider;
-import com.abavilla.fpi.sms.entity.UserStatus;
-import org.bson.codecs.Codec;
+import java.util.Optional;
 
-/**
- * MongoDB Codec registry, contains all the codec for classes that doesn't
- * work by default with default POJO codec for MongoDb driver.
- *
- * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
- */
-public class EnumCodecProvider implements IEnumCodecProvider {
-  /**
-   * Provides the codec mapping definition
-   *
-   * @param clazz Class to decode/encode
-   * @return {@link Codec} to use
-   * @param <T> Type of {@link Codec}
-   */
-  @Override
-  public <T> Codec<T> getCodecProvider(Class<T> clazz) {
-    if (clazz == char[].class) {
-      return (Codec<T>) new CharArrayCodec();
-    } else if (clazz == UserStatus.class) {
-      return (Codec<T>) new UserStatusCodec();
-    }
-    return null; // Don't throw here, this tells Mongo this provider doesn't provide a decoder for the requested clazz
+import javax.enterprise.context.ApplicationScoped;
+
+import com.abavilla.fpi.fw.repo.IMongoRepo;
+import com.abavilla.fpi.sms.entity.User;
+import io.smallrye.mutiny.Uni;
+
+@ApplicationScoped
+public class UserRepo implements IMongoRepo<User> {
+  public Uni<Optional<User>> findByMetaId(String metaId) {
+    return find("{'metaId': ?1}", metaId).singleResultOptional();
   }
 }

@@ -16,33 +16,57 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.     *
  ******************************************************************************/
 
-package com.abavilla.fpi.sms.config.codec;
+package com.abavilla.fpi.sms.entity;
 
-import com.abavilla.fpi.fw.config.codec.IEnumCodecProvider;
-import com.abavilla.fpi.sms.entity.UserStatus;
-import org.bson.codecs.Codec;
+import java.time.LocalDateTime;
+
+import com.abavilla.fpi.fw.entity.mongo.AbsMongoItem;
+import io.quarkus.mongodb.panache.common.MongoEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 
 /**
- * MongoDB Codec registry, contains all the codec for classes that doesn't
- * work by default with default POJO codec for MongoDb driver.
+ * Entity containing the information about the authorized users who are able to access the system
  *
  * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
  */
-public class EnumCodecProvider implements IEnumCodecProvider {
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@BsonDiscriminator
+@MongoEntity(collection="system_users")
+public class User extends AbsMongoItem {
+
   /**
-   * Provides the codec mapping definition
-   *
-   * @param clazz Class to decode/encode
-   * @return {@link Codec} to use
-   * @param <T> Type of {@link Codec}
+   * User id in Meta
    */
-  @Override
-  public <T> Codec<T> getCodecProvider(Class<T> clazz) {
-    if (clazz == char[].class) {
-      return (Codec<T>) new CharArrayCodec();
-    } else if (clazz == UserStatus.class) {
-      return (Codec<T>) new UserStatusCodec();
-    }
-    return null; // Don't throw here, this tells Mongo this provider doesn't provide a decoder for the requested clazz
-  }
+  private String metaId;
+
+  /**
+   * Mobile number
+   */
+  private String mobile;
+
+  /**
+   * Registration status
+   */
+  private UserStatus status;
+
+  /**
+   * Date and time when user first interacted or registered with system
+   */
+  private LocalDateTime registrationDate;
+
+  /**
+   * Date and time when user was verified
+   */
+  private LocalDateTime verifiedDate;
+
+  /**
+   * Date and time when user last interacted with system
+   */
+  private LocalDateTime lastAccess;
+
 }

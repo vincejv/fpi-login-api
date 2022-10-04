@@ -16,33 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.     *
  ******************************************************************************/
 
-package com.abavilla.fpi.sms.config.codec;
+package com.abavilla.fpi.sms.dto;
 
-import com.abavilla.fpi.fw.config.codec.IEnumCodecProvider;
-import com.abavilla.fpi.sms.entity.UserStatus;
-import org.bson.codecs.Codec;
+import io.quarkus.runtime.annotations.RegisterForReflection;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-/**
- * MongoDB Codec registry, contains all the codec for classes that doesn't
- * work by default with default POJO codec for MongoDb driver.
- *
- * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
- */
-public class EnumCodecProvider implements IEnumCodecProvider {
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@RegisterForReflection
+public class PasswordLoginDto extends LoginDto{
+
   /**
-   * Provides the codec mapping definition
-   *
-   * @param clazz Class to decode/encode
-   * @return {@link Codec} to use
-   * @param <T> Type of {@link Codec}
+   * Password for login
    */
-  @Override
-  public <T> Codec<T> getCodecProvider(Class<T> clazz) {
-    if (clazz == char[].class) {
-      return (Codec<T>) new CharArrayCodec();
-    } else if (clazz == UserStatus.class) {
-      return (Codec<T>) new UserStatusCodec();
-    }
-    return null; // Don't throw here, this tells Mongo this provider doesn't provide a decoder for the requested clazz
-  }
+  private String password;
+
+  /**
+   * IP Address of client trying to login
+   */
+  private String remoteAddress;
+
+  /**
+   * Browser User-agent of client trying to login
+   */
+  private String userAgent;
+
 }
