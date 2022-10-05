@@ -59,7 +59,7 @@ public class UserSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
         user.setLastAccess(DateUtil.now());
         user.setDateUpdated(DateUtil.now());
         if (user.getStatus() == UserStatus.VERIFIED) {
-          return repo.persist(user).map(ignored -> RestResponse.ok());
+          return repo.persistOrUpdate(user).map(ignored -> RestResponse.ok());
         } else {
           throw new FPISvcEx("User not yet verified",
               Response.Status.FORBIDDEN.getStatusCode());
