@@ -3,6 +3,9 @@ FROM quay.io/quarkus/ubi-quarkus-native-image:22.2-java17 AS build
 COPY --chown=quarkus:quarkus mvnw /code/mvnw
 COPY --chown=quarkus:quarkus .mvn /code/.mvn
 COPY --chown=quarkus:quarkus pom.xml /code/
+# Copy the modules
+COPY --chown=quarkus:quarkus fpi-login-api-core /code/fpi-login-api-core
+COPY --chown=quarkus:quarkus fpi-login-api-lib /code/fpi-login-api-lib
 USER quarkus
 WORKDIR /code
 RUN chmod +x ./mvnw
@@ -10,9 +13,6 @@ RUN chmod +x ./mvnw
 ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
 # RUN ./mvnw -s ./.mvn/wrapper/settings.xml -B org.apache.maven.plugins:maven-dependency-plugin:3.1.2:go-offline
-# Copy the modules
-COPY fpi-login-api-core /code/fpi-login-api-core
-COPY fpi-login-api-lib /code/fpi-login-api-lib
 # Build the package
 RUN ./mvnw -s ./.mvn/wrapper/settings.xml -B package -Pnative
 
