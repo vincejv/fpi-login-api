@@ -26,7 +26,7 @@
   <parent>
     <groupId>com.abavilla</groupId>
     <artifactId>fpi-login-api</artifactId>
-    <version>1.0.8-RC</version>
+    <version>1.0.9-RC</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
