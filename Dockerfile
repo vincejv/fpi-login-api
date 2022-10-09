@@ -11,8 +11,8 @@ ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
 # RUN ./mvnw -s ./.mvn/wrapper/settings.xml -B org.apache.maven.plugins:maven-dependency-plugin:3.1.2:go-offline
 # Copy the modules
-COPY fpi-login-api/fpi-login-api-core /code/src/fpi-login-api-core
-COPY fpi-login-api/fpi-login-api-lib /code/src/fpi-login-api-lib
+COPY fpi-login-api-core /code/fpi-login-api-core
+COPY fpi-login-api-lib /code/fpi-login-api-lib
 # Build the package
 RUN ./mvnw -s ./.mvn/wrapper/settings.xml -B package -Pnative
 
