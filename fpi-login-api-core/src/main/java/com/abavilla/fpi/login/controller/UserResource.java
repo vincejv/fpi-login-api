@@ -46,7 +46,7 @@ public class UserResource extends AbsBaseResource<LoginDto, User, UserSvc> {
   @POST
   @NoCache
   @Path("trusted")
-  public Uni<RestResponse<Void>> loginFromTrustedIdentityProvider(
+  public Uni<RestResponse<String>> loginFromTrustedIdentityProvider(
       WebhookLoginDto loginDto,
       @QueryParam("refreshToken")Boolean refreshToken){
     return service.authorizedLogin(loginDto);

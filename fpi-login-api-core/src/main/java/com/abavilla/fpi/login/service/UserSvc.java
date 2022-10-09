@@ -39,7 +39,7 @@ public class UserSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
   @Inject
   AuthzClient authzClient;
 
-  public Uni<RestResponse<Void>> authorizedLogin(WebhookLoginDto loginDto) {
+  public Uni<RestResponse<String>> authorizedLogin(WebhookLoginDto loginDto) {
     var byMetaId = repo.findByMetaId(loginDto.getUsername());
     return byMetaId.chain(f -> {
       if (f.isEmpty()) {
