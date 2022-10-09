@@ -1,8 +1,8 @@
 ## Stage 1 : build with maven builder image with native capabilities
 FROM quay.io/quarkus/ubi-quarkus-native-image:22.2-java17 AS build
-COPY --chown=quarkus:quarkus fpi-login-api/mvnw /code/mvnw
-COPY --chown=quarkus:quarkus fpi-login-api/.mvn /code/.mvn
-COPY --chown=quarkus:quarkus fpi-login-api/pom.xml /code/
+COPY --chown=quarkus:quarkus mvnw /code/mvnw
+COPY --chown=quarkus:quarkus .mvn /code/.mvn
+COPY --chown=quarkus:quarkus pom.xml /code/
 USER quarkus
 WORKDIR /code
 RUN chmod +x ./mvnw
@@ -13,6 +13,7 @@ ARG GITHUB_TOKEN
 # Copy the modules
 COPY fpi-login-api/fpi-login-api-core /code/src/fpi-login-api-core
 COPY fpi-login-api/fpi-login-api-lib /code/src/fpi-login-api-lib
+# Build the package
 RUN ./mvnw -s ./.mvn/wrapper/settings.xml -B package -Pnative
 
 ## Stage 2 : create the docker final image
