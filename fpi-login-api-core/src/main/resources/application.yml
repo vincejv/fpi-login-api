@@ -17,5 +17,5 @@ quarkus:
       enable: true
       paths:
         '1':
-          path: /fpi/login/*
+          path: /fpi/login
           enforcement-mode: DISABLED
