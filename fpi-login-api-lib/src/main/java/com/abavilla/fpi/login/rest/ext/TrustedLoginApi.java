@@ -18,7 +18,7 @@
  *  *****************************************************************************
  */
 
-package com.abavilla.fpi.login.rest;
+package com.abavilla.fpi.login.rest.ext;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

@@ -18,14 +18,13 @@
  *  *****************************************************************************
  */
 
-package com.abavilla.fpi.login.rest;
+package com.abavilla.fpi.login.rest.ext;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
 import com.abavilla.fpi.login.dto.PasswordLoginDto;
-import com.abavilla.fpi.login.rest.LoginApi;
 import io.quarkus.rest.client.reactive.ReactiveClientHeadersFactory;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -42,13 +41,13 @@ public class TrustedLoginPreAuth extends ReactiveClientHeadersFactory {
   /**
    * API Key for SMS service access
    */
-  @ConfigProperty(name = "fpi.app-to-app.auth.username", defaultValue = "undefined")
+  @ConfigProperty(name = "fpi.app-to-app.auth.username")
   String apiKey;
 
   /**
    * Secret Key for SMS service access
    */
-  @ConfigProperty(name = "fpi.app-to-app.auth.password", defaultValue = "undefined")
+  @ConfigProperty(name = "fpi.app-to-app.auth.password")
   String secretKey;
 
   /**
