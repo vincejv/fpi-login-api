@@ -82,7 +82,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
         user.setLastAccess(DateUtil.now());
         user.setDateUpdated(DateUtil.now());
         if (user.getStatus() == UserStatus.VERIFIED) {
-          return repo.persistOrUpdate(user).chain(ignored -> {
+          return repo.persistOrUpdate(user).chain(() -> {
             return sessionRepo
               .findByUsername(loginDto.getUsername()).chain(sessionOpt -> {
                 Session session = sessionOpt.orElse(new Session());
@@ -90,13 +90,14 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
                   // create a new session
                   var tokenResponse = authzClient.obtainAccessToken(loginDto.getUsername(), trustedKey);
                   mapLoginToSession(session, loginDto, tokenResponse);
+                  return sessionRepo.persistOrUpdate(session);
                 } else {
                   if (!LoginUtil.verifyHash(trustedKey.toCharArray(), session.getPassword())) {
                     throw new FPISvcEx("Incorrect login",
                         RestResponse.StatusCode.UNAUTHORIZED);
                   }
                 }
-                return sessionRepo.persistOrUpdate(session);
+                return Uni.createFrom().item(session);
               })
               .map(savedSession -> RestResponse.ok(mapper.mapToDto(savedSession)));
           }).onFailure(DuplicateKeyException.class).retry().withBackOff(
