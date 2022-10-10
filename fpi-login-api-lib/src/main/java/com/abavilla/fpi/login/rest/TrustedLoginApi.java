@@ -23,6 +23,7 @@ package com.abavilla.fpi.login.rest;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
+import com.abavilla.fpi.login.dto.SessionDto;
 import com.abavilla.fpi.login.dto.WebhookLoginDto;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
@@ -40,5 +41,5 @@ public interface TrustedLoginApi {
    */
   @POST
   @Path("trusted")
-  Uni<RestResponse<String>> webhookAuthenticate(WebhookLoginDto login);
+  Uni<RestResponse<SessionDto>> webhookAuthenticate(WebhookLoginDto login);
 }

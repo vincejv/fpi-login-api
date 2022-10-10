@@ -22,7 +22,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fpi-login-api</artifactId>
   <name>fpi-login-api</name>
-  <version>1.0.10-RC</version>
+  <version>1.0.11-RC</version>
   <packaging>pom</packaging>
 
   <parent>

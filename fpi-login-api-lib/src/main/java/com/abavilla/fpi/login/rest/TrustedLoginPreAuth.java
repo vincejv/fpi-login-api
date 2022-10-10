@@ -42,13 +42,13 @@ public class TrustedLoginPreAuth extends ReactiveClientHeadersFactory {
   /**
    * API Key for SMS service access
    */
-  @ConfigProperty(name = "fpi.app-to-app.auth.username")
+  @ConfigProperty(name = "fpi.app-to-app.auth.username", defaultValue = "undefined")
   String apiKey;
 
   /**
    * Secret Key for SMS service access
    */
-  @ConfigProperty(name = "fpi.app-to-app.auth.password")
+  @ConfigProperty(name = "fpi.app-to-app.auth.password", defaultValue = "undefined")
   String secretKey;
 
   /**
