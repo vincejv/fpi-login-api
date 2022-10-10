@@ -14,19 +14,19 @@
   ~ GNU General Public License for more details.                              ~
   ~                                                                           ~
   ~ You should have received a copy of the GNU General Public License         ~
-  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.    ~
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses />.    ~
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fpi-login-api-lib</artifactId>
+  <version>1.0.14-RC-SNAPSHOT</version>
   <name>fpi-login-api-lib</name>
 
   <parent>
     <groupId>com.abavilla</groupId>
     <artifactId>fpi-login-api</artifactId>
-    <version>1.0.13-RC</version>
+    <version>1.0.15-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 

@@ -14,10 +14,9 @@
   ~ GNU General Public License for more details.                              ~
   ~                                                                           ~
   ~ You should have received a copy of the GNU General Public License         ~
-  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.    ~
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses />.    ~
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <scm>
     <url>https://github.com/vincejv/fpi-login-api</url>
     <connection>scm:git:git://github.com/vincejv/fpi-login-api.git</connection>
@@ -28,7 +27,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fpi-login-api</artifactId>
   <name>fpi-login-api</name>
-  <version>1.0.14-SNAPSHOT</version>
+  <version>1.0.15-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <parent>
@@ -60,7 +59,7 @@
       <dependency>
         <groupId>com.abavilla</groupId>
         <artifactId>fpi-login-api-lib</artifactId>
-        <version>${project.version}</version>
+        <version>1.0.14-RC-SNAPSHOT</version>
       </dependency>
 
       <dependency>
