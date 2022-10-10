@@ -20,13 +20,12 @@
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fpi-login-api-core</artifactId>
-  <version>1.0.15-SNAPSHOT</version>
   <name>fpi-login-api-core</name>
 
   <parent>
     <groupId>com.abavilla</groupId>
     <artifactId>fpi-login-api</artifactId>
-    <version>1.0.15-SNAPSHOT</version>
+    <version>1.0.16</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 

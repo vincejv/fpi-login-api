@@ -21,13 +21,13 @@
     <url>https://github.com/vincejv/fpi-login-api</url>
     <connection>scm:git:git://github.com/vincejv/fpi-login-api.git</connection>
     <developerConnection>scm:git:git@github.com:vincejv/fpi-login-api.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>fpi-login-api-1.0.16</tag>
   </scm>
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fpi-login-api</artifactId>
   <name>fpi-login-api</name>
-  <version>1.0.15-SNAPSHOT</version>
+  <version>1.0.16</version>
   <packaging>pom</packaging>
 
   <parent>
@@ -59,7 +59,7 @@
       <dependency>
         <groupId>com.abavilla</groupId>
         <artifactId>fpi-login-api-lib</artifactId>
-        <version>1.0.14-RC-SNAPSHOT</version>
+        <version>${project.parent.version}</version>
       </dependency>
 
       <dependency>
