@@ -62,10 +62,10 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
   @Inject
   AuthzClient authzClient;
 
-  public Uni<RestResponse<SessionDto>> authorizedLogin(WebhookLoginDto loginDto) {
+  public Uni<SessionDto> authorizedLogin(WebhookLoginDto loginDto) {
     var byMetaId = repo.findByMetaId(loginDto.getUsername());
-    return byMetaId.chain(f -> {
-      if (f.isEmpty()) {
+    return byMetaId.chain(authorizedUser -> {
+      if (authorizedUser.isEmpty()) {
         // register
         User user = new User();
         user.setMetaId(loginDto.getUsername());
@@ -75,10 +75,14 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
         user.setDateUpdated(DateUtil.now());
         user.setRegistrationDate(DateUtil.now());
         user.setLastAccess(DateUtil.now());
-        return repo.persist(user).map(ignored -> RestResponse.accepted(new SessionDto()));
+        return repo.persist(user).map(ignored -> {
+          SessionDto sessionDto = new SessionDto();
+          sessionDto.setStatus(SessionDto.SessionStatus.CREATED_USER);
+          return sessionDto;
+        });
       } else {
-        // get current user
-        User user = f.get();
+        // get registered user
+        User user = authorizedUser.get();
         user.setLastAccess(DateUtil.now());
         user.setDateUpdated(DateUtil.now());
         if (user.getStatus() == UserStatus.VERIFIED) {
@@ -99,7 +103,11 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
                 }
                 return Uni.createFrom().item(session);
               })
-              .map(savedSession -> RestResponse.ok(mapper.mapToDto(savedSession)));
+              .map(savedSession -> {
+                SessionDto sessionDto = mapper.mapToDto(savedSession);
+                sessionDto.setStatus(SessionDto.SessionStatus.ESTABLISHED);
+                return sessionDto;
+              });
           }).onFailure(DuplicateKeyException.class).retry().withBackOff(
               Duration.ofSeconds(3)).withJitter(0.2).indefinitely();
         } else {
@@ -124,8 +132,6 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
     session.setAccessToken(auth.getToken());
     session.setRefreshToken(auth.getRefreshToken());
     session.setDateCreated(DateUtil.now());
-//    session.setIpAddress(login.getRemoteAddress());
-//    session.setUserAgent(login.getUserAgent());
     session.setRefreshTokenExpiry(DateUtil.now()
         .plusSeconds(auth.getExpiresIn()));
   }
