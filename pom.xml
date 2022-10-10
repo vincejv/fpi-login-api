@@ -21,13 +21,13 @@
     <url>https://github.com/vincejv/fpi-login-api</url>
     <connection>scm:git:git://github.com/vincejv/fpi-login-api.git</connection>
     <developerConnection>scm:git:git@github.com:vincejv/fpi-login-api.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>fpi-login-api-1.0.18</tag>
   </scm>
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fpi-login-api</artifactId>
   <name>fpi-login-api</name>
-  <version>1.0.18-SNAPSHOT</version>
+  <version>1.0.18</version>
   <packaging>pom</packaging>
 
   <parent>
