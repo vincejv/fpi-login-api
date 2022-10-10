@@ -111,7 +111,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
           }).onFailure(DuplicateKeyException.class).retry().withBackOff(
               Duration.ofSeconds(3)).withJitter(0.2).indefinitely();
         } else {
-          throw new FPISvcEx("User not yet verified",
+          throw new FPISvcEx("User not yet verified yet",
               Response.Status.FORBIDDEN.getStatusCode());
         }
       }
