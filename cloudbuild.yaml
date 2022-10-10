@@ -40,7 +40,7 @@ steps:
       - >-
         --set-env-vars=OIDC_CLIENT_ID=$_OIDC_CLIENT_ID,OIDC_AUTH_URL=$_OIDC_AUTH_URL
       - >-
-        --set-secrets=MONGO_CONN_STRING=vbl_mongo_connection_string:latest,OIDC_SECRET=oidc_secret_keycloak:latest
+        --set-secrets=MONGO_CONN_STRING=vbl_mongo_connection_string:latest,OIDC_SECRET=oidc_secret_keycloak:latest,FPI_APP_TO_APP_TRUSTED_KEY=fpi_app_to_app_trusted_key:latest
       - >-
         --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID,$_LABELS
       - '--cpu=1000m'

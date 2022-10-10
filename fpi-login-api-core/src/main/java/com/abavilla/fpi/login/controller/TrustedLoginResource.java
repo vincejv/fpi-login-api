@@ -26,9 +26,10 @@ import com.abavilla.fpi.fw.controller.AbsBaseResource;
 import com.abavilla.fpi.fw.dto.impl.RespDto;
 import com.abavilla.fpi.fw.exceptions.FPISvcEx;
 import com.abavilla.fpi.login.dto.LoginDto;
+import com.abavilla.fpi.login.dto.SessionDto;
 import com.abavilla.fpi.login.dto.WebhookLoginDto;
 import com.abavilla.fpi.login.entity.User;
-import com.abavilla.fpi.login.service.UserSvc;
+import com.abavilla.fpi.login.service.TrustedLoginSvc;
 import io.smallrye.mutiny.Uni;
 import org.jboss.resteasy.reactive.NoCache;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -41,12 +42,12 @@ import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
  * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
  */
 @Path("/fpi/login")
-public class UserResource extends AbsBaseResource<LoginDto, User, UserSvc> {
+public class TrustedLoginResource extends AbsBaseResource<LoginDto, User, TrustedLoginSvc> {
 
   @POST
   @NoCache
   @Path("trusted")
-  public Uni<RestResponse<String>> loginFromTrustedIdentityProvider(
+  public Uni<RestResponse<SessionDto>> loginFromTrustedIdentityProvider(
       WebhookLoginDto loginDto,
       @QueryParam("refreshToken")Boolean refreshToken){
     return service.authorizedLogin(loginDto);

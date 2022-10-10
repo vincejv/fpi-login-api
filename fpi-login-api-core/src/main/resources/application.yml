@@ -19,3 +19,8 @@ quarkus:
         '1':
           path: /fpi/login
           enforcement-mode: DISABLED
+
+fpi:
+  app-to-app:
+    auth:
+      trusted-key: ${FPI_APP_TO_APP_TRUSTED_KEY:AABBCCDDEE123}

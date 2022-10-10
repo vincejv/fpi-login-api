@@ -21,21 +21,24 @@
 package com.abavilla.fpi.login.rest;
 
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-import com.abavilla.fpi.login.dto.LoginDto;
-import com.abavilla.fpi.login.dto.SessionDto;
+import com.abavilla.fpi.login.dto.WebhookLoginDto;
 import io.smallrye.mutiny.Uni;
+import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.reactive.RestResponse;
 
 @RegisterRestClient(configKey = "login-api")
-public interface LoginApi {
+@RegisterClientHeaders(TrustedLoginPreAuth.class)
+public interface TrustedLoginApi {
 
   /**
-   * Obtain a session token from authentication service.
-   * @param login {@link LoginDto} object
-   *
-   * @return {@link SessionDto} object containing the session info
+   * Perform a trusted login
+   * @param login Login credentials
+   * @return
    */
   @POST
-  Uni<SessionDto> authenticate(LoginDto login);
+  @Path("trusted")
+  Uni<RestResponse<String>> webhookAuthenticate(WebhookLoginDto login);
 }
