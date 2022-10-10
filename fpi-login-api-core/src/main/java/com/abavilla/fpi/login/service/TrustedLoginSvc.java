@@ -18,9 +18,7 @@
 
 package com.abavilla.fpi.login.service;
 
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.time.Duration;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -30,7 +28,6 @@ import com.abavilla.fpi.fw.exceptions.FPISvcEx;
 import com.abavilla.fpi.fw.service.AbsRepoSvc;
 import com.abavilla.fpi.fw.util.DateUtil;
 import com.abavilla.fpi.login.dto.LoginDto;
-import com.abavilla.fpi.login.dto.PasswordLoginDto;
 import com.abavilla.fpi.login.dto.SessionDto;
 import com.abavilla.fpi.login.dto.WebhookLoginDto;
 import com.abavilla.fpi.login.entity.Session;
@@ -40,6 +37,7 @@ import com.abavilla.fpi.login.mapper.SessionMapper;
 import com.abavilla.fpi.login.repo.SessionRepo;
 import com.abavilla.fpi.login.repo.UserRepo;
 import com.abavilla.fpi.login.util.LoginUtil;
+import com.mongodb.DuplicateKeyException;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -85,16 +83,24 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
         user.setDateUpdated(DateUtil.now());
         if (user.getStatus() == UserStatus.VERIFIED) {
           return repo.persistOrUpdate(user).chain(ignored -> {
-            var tokenResponse = authzClient.obtainAccessToken(loginDto.getUsername(), trustedKey);
             return sessionRepo
-                .findByUsername(loginDto.getUsername()).map(sessionOpt -> {
-                  Session session = sessionOpt.orElse(new Session());
+              .findByUsername(loginDto.getUsername()).chain(sessionOpt -> {
+                Session session = sessionOpt.orElse(new Session());
+                if (sessionOpt.isEmpty()) {
+                  // create a new session
+                  var tokenResponse = authzClient.obtainAccessToken(loginDto.getUsername(), trustedKey);
                   mapLoginToSession(session, loginDto, tokenResponse);
-                  return session;
-                })
-                .chain(mappedSession -> sessionRepo.persistOrUpdate(mappedSession))
-                .map(savedSession -> RestResponse.ok(mapper.mapToDto(savedSession)));
-          });
+                } else {
+                  if (!LoginUtil.verifyHash(trustedKey.toCharArray(), session.getPassword())) {
+                    throw new FPISvcEx("Incorrect login",
+                        RestResponse.StatusCode.UNAUTHORIZED);
+                  }
+                }
+                return sessionRepo.persistOrUpdate(session);
+              })
+              .map(savedSession -> RestResponse.ok(mapper.mapToDto(savedSession)));
+          }).onFailure(DuplicateKeyException.class).retry().withBackOff(
+              Duration.ofSeconds(3)).withJitter(0.2).indefinitely();
         } else {
           throw new FPISvcEx("User not yet verified",
               Response.Status.FORBIDDEN.getStatusCode());
