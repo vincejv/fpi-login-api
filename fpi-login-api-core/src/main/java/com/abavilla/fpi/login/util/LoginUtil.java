@@ -56,7 +56,7 @@ public class LoginUtil {
   @PostConstruct
   public void init() {
     var bcryptVersion = BCrypt.Version.VERSION_2Y;
-    var strategy = LongPasswordStrategies.strict(bcryptVersion);
+    var strategy = LongPasswordStrategies.truncate(bcryptVersion);
     bcrypt = BCrypt.with(bcryptVersion, new SecureRandom(), strategy);
     verifier = BCrypt.verifyer(bcryptVersion, strategy);
   }
