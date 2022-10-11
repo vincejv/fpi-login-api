@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.     *
  ******************************************************************************/
 
-package com.abavilla.fpi.login.dto;
+package com.abavilla.fpi.login.ext.dto;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;

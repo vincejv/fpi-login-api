@@ -22,8 +22,8 @@ import java.time.LocalDateTime;
 
 import com.abavilla.fpi.fw.mapper.IDtoToEntityMapper;
 import com.abavilla.fpi.fw.util.DateUtil;
-import com.abavilla.fpi.login.dto.SessionDto;
 import com.abavilla.fpi.login.entity.Session;
+import com.abavilla.fpi.login.ext.dto.SessionDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -16,32 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.     *
  ******************************************************************************/
 
-package com.abavilla.fpi.login.dto;
+package com.abavilla.fpi.login.ext.dto;
 
+import com.abavilla.fpi.fw.dto.AbsDto;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data transfer object containing the information to create and validate a login session.
+ *
+ * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @RegisterForReflection
-public class PasswordLoginDto extends LoginDto{
+public class LoginDto extends AbsDto {
 
   /**
-   * Password for login
+   * Username for login
    */
-  private String password;
-
-  /**
-   * IP Address of client trying to login
-   */
-  private String remoteAddress;
-
-  /**
-   * Browser User-agent of client trying to login
-   */
-  private String userAgent;
-
+  private String username;
 }

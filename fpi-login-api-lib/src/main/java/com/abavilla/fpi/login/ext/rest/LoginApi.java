@@ -18,12 +18,12 @@
  *  *****************************************************************************
  */
 
-package com.abavilla.fpi.login.rest.ext;
+package com.abavilla.fpi.login.ext.rest;
 
 import javax.ws.rs.POST;
 
-import com.abavilla.fpi.login.dto.LoginDto;
-import com.abavilla.fpi.login.dto.SessionDto;
+import com.abavilla.fpi.login.ext.dto.LoginDto;
+import com.abavilla.fpi.login.ext.dto.SessionDto;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 

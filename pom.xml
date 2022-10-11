@@ -33,7 +33,7 @@
   <parent>
     <groupId>com.abavilla</groupId>
     <artifactId>fpi-framework-pom</artifactId>
-    <version>1.0.111-RC</version>
+    <version>1.0.112</version>
   </parent>
 
   <modules>
@@ -59,7 +59,7 @@
       <dependency>
         <groupId>com.abavilla</groupId>
         <artifactId>fpi-login-api-lib</artifactId>
-        <version>${project.parent.version}</version>
+        <version>${project.version}</version>
       </dependency>
 
       <dependency>

@@ -26,10 +26,10 @@ import javax.ws.rs.NotAuthorizedException;
 
 import com.abavilla.fpi.fw.service.AbsRepoSvc;
 import com.abavilla.fpi.fw.util.DateUtil;
-import com.abavilla.fpi.login.dto.LoginDto;
-import com.abavilla.fpi.login.dto.PasswordLoginDto;
-import com.abavilla.fpi.login.dto.SessionDto;
 import com.abavilla.fpi.login.entity.Session;
+import com.abavilla.fpi.login.ext.dto.LoginDto;
+import com.abavilla.fpi.login.ext.dto.PasswordLoginDto;
+import com.abavilla.fpi.login.ext.dto.SessionDto;
 import com.abavilla.fpi.login.mapper.SessionMapper;
 import com.abavilla.fpi.login.repo.SessionRepo;
 import com.abavilla.fpi.login.util.LoginConst;

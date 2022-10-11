@@ -18,14 +18,14 @@
  *  *****************************************************************************
  */
 
-package com.abavilla.fpi.login.rest.ext;
+package com.abavilla.fpi.login.ext.rest;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import com.abavilla.fpi.fw.dto.impl.RespDto;
-import com.abavilla.fpi.login.dto.SessionDto;
-import com.abavilla.fpi.login.dto.WebhookLoginDto;
+import com.abavilla.fpi.login.ext.dto.SessionDto;
+import com.abavilla.fpi.login.ext.dto.WebhookLoginDto;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
