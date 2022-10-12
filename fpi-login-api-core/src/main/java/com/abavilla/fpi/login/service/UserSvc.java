@@ -18,28 +18,60 @@
  *  *****************************************************************************
  */
 
-package com.abavilla.fpi.login.ext.rest;
+package com.abavilla.fpi.login.service;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
-import com.abavilla.fpi.fw.dto.impl.RespDto;
-import com.abavilla.fpi.login.ext.dto.SessionDto;
-import com.abavilla.fpi.login.ext.dto.WebhookLoginDto;
+import com.abavilla.fpi.fw.exceptions.FPISvcEx;
+import com.abavilla.fpi.fw.service.AbsRepoSvc;
+import com.abavilla.fpi.login.entity.User;
+import com.abavilla.fpi.login.ext.dto.UserDto;
+import com.abavilla.fpi.login.mapper.UserMapper;
+import com.abavilla.fpi.login.repo.UserRepo;
 import io.smallrye.mutiny.Uni;
-import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.reactive.RestResponse;
 
-@RegisterRestClient(configKey = "login-api")
-@RegisterClientHeaders(AppToAppPreAuth.class)
-public interface TrustedLoginApi {
+/**
+ * Service layer for creating and managing authorized system users.
+ *
+ * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
+ */
+@ApplicationScoped
+public class UserSvc extends AbsRepoSvc<UserDto, User, UserRepo> {
+
+  @Inject
+  UserMapper userMapper;
 
   /**
-   * Perform a trusted login through {@code /fpi/login/trusted}
-   * @param login Login credentials
-   * @return {@link SessionDto} object
+   * {@inheritDoc}
    */
-  @POST
-  @Path("trusted")
-  Uni<RespDto<SessionDto>> webhookAuthenticate(WebhookLoginDto login);
+  @Override
+  public UserDto mapToDto(User entity) {
+    return userMapper.mapToDto(entity);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public User mapToEntity(UserDto dto) {
+    return userMapper.mapToEntity(dto);
+  }
+
+  /**
+   * Retrieves {@link User} given the user's {@code metaId}.
+   *
+   * @param metaId the meta id
+   * @return {@link UserDto}
+   */
+  public Uni<UserDto> getByMetaId(String metaId) {
+    return repo.findByMetaId(metaId).chain(user -> {
+      if (user.isPresent()) {
+        return Uni.createFrom().item(this.mapToDto(user.get()));
+      }
+      throw new FPISvcEx(String.format("User with metaId %s was not found",
+        RestResponse.StatusCode.NOT_FOUND));
+    });
+  }
 }

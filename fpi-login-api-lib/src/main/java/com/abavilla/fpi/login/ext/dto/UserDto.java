@@ -18,28 +18,33 @@
  *  *****************************************************************************
  */
 
-package com.abavilla.fpi.login.ext.rest;
+package com.abavilla.fpi.login.ext.dto;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import com.abavilla.fpi.fw.dto.AbsDto;
+import io.quarkus.runtime.annotations.RegisterForReflection;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import com.abavilla.fpi.fw.dto.impl.RespDto;
-import com.abavilla.fpi.login.ext.dto.SessionDto;
-import com.abavilla.fpi.login.ext.dto.WebhookLoginDto;
-import io.smallrye.mutiny.Uni;
-import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-
-@RegisterRestClient(configKey = "login-api")
-@RegisterClientHeaders(AppToAppPreAuth.class)
-public interface TrustedLoginApi {
+/**
+ * Data transfer object containing the information regarding a system authorized user.
+ *
+ * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@RegisterForReflection
+public class UserDto extends AbsDto {
 
   /**
-   * Perform a trusted login through {@code /fpi/login/trusted}
-   * @param login Login credentials
-   * @return {@link SessionDto} object
+   * User id in Meta
    */
-  @POST
-  @Path("trusted")
-  Uni<RespDto<SessionDto>> webhookAuthenticate(WebhookLoginDto login);
+  private String metaId;
+
+  /**
+   * Mobile number
+   */
+  private String mobile;
+
 }

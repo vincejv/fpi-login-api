@@ -36,16 +36,16 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
  * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
  */
 @ApplicationScoped
-public class TrustedLoginPreAuth extends ReactiveClientHeadersFactory {
+public class AppToAppPreAuth extends ReactiveClientHeadersFactory {
 
   /**
-   * API Key for SMS service access
+   * API Key for app-to-app service access
    */
   @ConfigProperty(name = "fpi.app-to-app.auth.username")
   String apiKey;
 
   /**
-   * Secret Key for SMS service access
+   * Secret Key for app-to-app service access
    */
   @ConfigProperty(name = "fpi.app-to-app.auth.password")
   String secretKey;

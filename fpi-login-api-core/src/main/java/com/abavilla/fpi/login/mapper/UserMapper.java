@@ -18,28 +18,21 @@
  *  *****************************************************************************
  */
 
-package com.abavilla.fpi.login.ext.rest;
+package com.abavilla.fpi.login.mapper;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import com.abavilla.fpi.fw.mapper.IDtoToEntityMapper;
+import com.abavilla.fpi.login.entity.User;
+import com.abavilla.fpi.login.ext.dto.UserDto;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
 
-import com.abavilla.fpi.fw.dto.impl.RespDto;
-import com.abavilla.fpi.login.ext.dto.SessionDto;
-import com.abavilla.fpi.login.ext.dto.WebhookLoginDto;
-import io.smallrye.mutiny.Uni;
-import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-
-@RegisterRestClient(configKey = "login-api")
-@RegisterClientHeaders(AppToAppPreAuth.class)
-public interface TrustedLoginApi {
-
-  /**
-   * Perform a trusted login through {@code /fpi/login/trusted}
-   * @param login Login credentials
-   * @return {@link SessionDto} object
-   */
-  @POST
-  @Path("trusted")
-  Uni<RespDto<SessionDto>> webhookAuthenticate(WebhookLoginDto login);
+/**
+ * Mapper used for converting between {@link UserDto} and {@link User} entity
+ *
+ * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
+ */
+@Mapper(componentModel = MappingConstants.ComponentModel.CDI,
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+public interface UserMapper extends IDtoToEntityMapper<UserDto, User> {
 }

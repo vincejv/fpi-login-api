@@ -18,28 +18,56 @@
  *  *****************************************************************************
  */
 
-package com.abavilla.fpi.login.ext.rest;
+package com.abavilla.fpi.login.controller;
 
-import javax.ws.rs.POST;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 
+import com.abavilla.fpi.fw.controller.AbsReadOnlyResource;
 import com.abavilla.fpi.fw.dto.impl.RespDto;
-import com.abavilla.fpi.login.ext.dto.SessionDto;
-import com.abavilla.fpi.login.ext.dto.WebhookLoginDto;
+import com.abavilla.fpi.fw.exceptions.FPISvcEx;
+import com.abavilla.fpi.fw.util.DateUtil;
+import com.abavilla.fpi.login.entity.User;
+import com.abavilla.fpi.login.ext.dto.UserDto;
+import com.abavilla.fpi.login.service.UserSvc;
 import io.smallrye.mutiny.Uni;
-import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.reactive.RestResponse;
+import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
-@RegisterRestClient(configKey = "login-api")
-@RegisterClientHeaders(AppToAppPreAuth.class)
-public interface TrustedLoginApi {
+/**
+ * Resource for managing authorized system users in FPI system.
+ * URI Path: {@code "/fpi/user"}
+ *
+ * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
+ */
+@Path("/fpi/user")
+public class UserResource extends AbsReadOnlyResource<UserDto, User, UserSvc> {
 
   /**
-   * Perform a trusted login through {@code /fpi/login/trusted}
-   * @param login Login credentials
-   * @return {@link SessionDto} object
+   * Retrieves {@link UserDto} given the user's {@code metaId}.
+   *
+   * @param metaId the meta id
+   * @return {@link UserDto}
    */
-  @POST
-  @Path("trusted")
-  Uni<RespDto<SessionDto>> webhookAuthenticate(WebhookLoginDto login);
+  @GET
+  public Uni<RespDto<UserDto>> getByMetaId(@QueryParam("metaId") String metaId) {
+    return service.getByMetaId(metaId).map(user -> {
+      RespDto<UserDto> resp = new RespDto<>();
+      resp.setTimestamp(DateUtil.nowAsStr());
+      resp.setResp(user);
+      resp.setStatus(RestResponse.Status.FOUND.getReasonPhrase());
+      return resp;
+    });
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @ServerExceptionMapper
+  protected RestResponse<RespDto<Object>> mapException(FPISvcEx x) {
+    return super.mapException(x);
+  }
+
 }

@@ -20,26 +20,26 @@
 
 package com.abavilla.fpi.login.ext.rest;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.GET;
+import javax.ws.rs.QueryParam;
 
 import com.abavilla.fpi.fw.dto.impl.RespDto;
-import com.abavilla.fpi.login.ext.dto.SessionDto;
-import com.abavilla.fpi.login.ext.dto.WebhookLoginDto;
+import com.abavilla.fpi.login.ext.dto.UserDto;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-@RegisterRestClient(configKey = "login-api")
+@RegisterRestClient(configKey = "user-api")
 @RegisterClientHeaders(AppToAppPreAuth.class)
-public interface TrustedLoginApi {
+public interface UserApi {
 
   /**
-   * Perform a trusted login through {@code /fpi/login/trusted}
-   * @param login Login credentials
-   * @return {@link SessionDto} object
+   * Retrieves {@link UserDto} given the user's {@code metaId}.
+   *
+   * @param metaId the meta id
+   * @return {@link UserDto}
    */
-  @POST
-  @Path("trusted")
-  Uni<RespDto<SessionDto>> webhookAuthenticate(WebhookLoginDto login);
+  @GET
+  Uni<RespDto<UserDto>> getByMetaId(@QueryParam("metaId") String metaId);
+
 }
