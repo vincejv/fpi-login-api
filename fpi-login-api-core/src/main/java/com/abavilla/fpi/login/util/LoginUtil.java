@@ -20,19 +20,20 @@ package com.abavilla.fpi.login.util;
 
 import java.security.SecureRandom;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Singleton;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import at.favre.lib.crypto.bcrypt.LongPasswordStrategies;
+import io.quarkus.runtime.StartupEvent;
 
 /**
  * Utility methods used by the Login API service
  *
  * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
  */
-@Singleton
-public class LoginUtil {
+@ApplicationScoped
+public final class LoginUtil {
 
   /**
    * BCrypt hasher
@@ -48,13 +49,14 @@ public class LoginUtil {
    * Exponential cost (log2 factor) between {@link BCrypt#MIN_COST}
    * and {@link BCrypt#MAX_COST} e.g. 12 --&gt; 2^12 = 4,096 iterations
    */
-  private final static int BCRYPT_HASH_COST = BCrypt.MIN_COST;
+  private static final int BCRYPT_HASH_COST = BCrypt.MIN_COST;
+
 
   /**
    * Initialize utility library.
+   * @param evt the startup event
    */
-  @PostConstruct
-  public void init() {
+  public synchronized void init(@Observes StartupEvent evt) {
     var bcryptVersion = BCrypt.Version.VERSION_2Y;
     var strategy = LongPasswordStrategies.truncate(bcryptVersion);
     bcrypt = BCrypt.with(bcryptVersion, new SecureRandom(), strategy);
