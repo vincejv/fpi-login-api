@@ -70,6 +70,7 @@ jobs:
     needs: code_quality_checks
     outputs:
       artifact_version: ${{ steps.gen_ver.outputs.artifact_version }}
+      service_image_path: ${{ steps.image_version.outputs.service_image_path }}
     permissions:
       contents: read
       packages: write
@@ -91,13 +92,18 @@ jobs:
           java-version: 17
           cache: maven
 
-      - name: Generate native image
-        run: mvn -B package -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.builder-image=${{ env.NATIVE_IMAGE_BUILDER }}
-
-      - name: Store artifact version
+      - name: Prepare artifact version
         id: gen_ver
         run: |
           echo "artifact_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+
+      - name: Prepare Docker image tag
+        id: image_version
+        run: |
+          echo "service_image_path=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ steps.gen_ver.outputs.artifact_version }}" >> $GITHUB_OUTPUT
+
+      - name: Generate native image
+        run: mvn -B package -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.builder-image=${{ env.NATIVE_IMAGE_BUILDER }}
 
       - name: Google Auth
         id: gcp-auth
@@ -129,7 +135,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ github.sha }}
+          images: ${{ steps.image_version.outputs.service_image_path }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
@@ -137,8 +143,7 @@ jobs:
           context: .
           push: true
           tags: | # ${{ steps.meta.outputs.tags }} - (For public repositories like docker hub)
-            ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ github.sha }}
-            ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ steps.gen_ver.outputs.artifact_version }}
+            ${{ steps.image_version.outputs.service_image_path }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Deploy to cloud run
@@ -147,7 +152,7 @@ jobs:
         with:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
-          image: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ github.sha }}
+          image: ${{ steps.image_version.outputs.service_image_path }}
           project_id: ${{ env.PROJECT_ID }}
           flags: --cpu ${{ env.SERVICE_CPU }} --memory ${{ env.SERVICE_MEMORY }}
           env_vars: |

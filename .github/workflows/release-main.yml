@@ -43,6 +43,7 @@ jobs:
     outputs:
       new_tag: ${{ steps.tag_version.outputs.new_tag }}
       changelog: ${{ steps.tag_version.outputs.changelog }}
+      service_image_path: ${{ steps.image_version.outputs.service_image_path }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -52,6 +53,11 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare Docker image tag
+        id: image_version
+        run: |
+          echo "service_image_path=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ steps.tag_version.outputs.new_tag }}" >> $GITHUB_OUTPUT
 
   rebase_dev:
     name: Sync development branch
@@ -171,7 +177,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ github.sha }}
+          images: ${{ needs.versioning.outputs.service_image_path }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
@@ -179,8 +185,7 @@ jobs:
           context: .
           push: true
           tags: |  # ${{ steps.meta.outputs.tags }} - (For public repositories like docker hub)
-            ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ github.sha }}
-            ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ needs.versioning.outputs.new_tag }}
+            ${{ needs.versioning.outputs.service_image_path }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             GITHUB_USERNAME=${{ github.actor }}
@@ -192,7 +197,7 @@ jobs:
         with:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
-          image: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ github.sha }}
+          image: ${{ needs.versioning.outputs.service_image_path }}
           project_id: ${{ env.PROJECT_ID }}
           flags: --cpu ${{ env.SERVICE_CPU }} --memory ${{ env.SERVICE_MEMORY }}
           env_vars: |
