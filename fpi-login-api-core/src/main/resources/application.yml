@@ -1,0 +1,28 @@
+quarkus:
+  http:
+    port: ${PORT:8080}
+  arc:
+    exclude-types: com.abavilla.fpi.login.ext.rest.*
+  mongodb:
+    connection-string:
+      ${MONGO_CONN_STRING:mongodb://localhost}
+    database: vbl
+  oidc:
+    auth-server-url: ${OIDC_AUTH_URL:https://localhost:8543/realms/quarkus}
+    client-id: ${OIDC_CLIENT_ID:backend-api}
+    credentials:
+      secret: ${OIDC_SECRET:AABBCC}
+    tls:
+      verification: none
+  keycloak:
+    policy-enforcer:
+      enable: true
+      paths:
+        '1':
+          path: /fpi/login
+          enforcement-mode: DISABLED
+
+fpi:
+  app-to-app:
+    auth:
+      trusted-key: ${FPI_APP_TO_APP_TRUSTED_KEY:AABBCCDDEE123}

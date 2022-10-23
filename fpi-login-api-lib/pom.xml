@@ -41,47 +41,54 @@
     <tag>HEAD</tag>
   </scm>
 
-  <name>FPI Login API parent POM</name>
+  <name>FPI Login API shared library</name>
   <description>Reactive backend REST login authentication API for FPI System</description>
   <url>https://github.com/vincejv/fpi-login-api</url>
   <inceptionYear>2022</inceptionYear>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>fpi-login-api</artifactId>
+  <artifactId>fpi-login-api-lib</artifactId>
   <version>0</version>
-  <packaging>pom</packaging>
 
   <parent>
     <groupId>com.abavilla</groupId>
-    <artifactId>fpi-framework-pom</artifactId>
-    <version>1.1.20</version>
+    <artifactId>fpi-login-api</artifactId>
+    <version>0</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
-
-  <modules>
-    <module>fpi-login-api-lib</module>
-    <module>fpi-login-api-core</module>
-  </modules>
 
   <properties>
 
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
+  <dependencies>
 
-      <dependency>
-        <groupId>com.abavilla</groupId>
-        <artifactId>fpi-login-api-lib</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+    <dependency>
+      <groupId>at.favre.lib</groupId>
+      <artifactId>bcrypt</artifactId>
+    </dependency>
 
-      <dependency>
-        <groupId>at.favre.lib</groupId>
-        <artifactId>bcrypt</artifactId>
-        <version>0.9.0</version>
-      </dependency>
+  </dependencies>
+  <build>
+    <plugins>
 
-    </dependencies>
-  </dependencyManagement>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
 
+      <plugin>
+        <groupId>org.jboss.jandex</groupId>
+        <artifactId>jandex-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+
+    </plugins>
+  </build>
 </project>
