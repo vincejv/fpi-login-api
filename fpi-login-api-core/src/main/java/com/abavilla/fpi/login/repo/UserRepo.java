@@ -22,12 +22,12 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import com.abavilla.fpi.fw.repo.IMongoRepo;
+import com.abavilla.fpi.fw.repo.AbsMongoRepo;
 import com.abavilla.fpi.login.entity.User;
 import io.smallrye.mutiny.Uni;
 
 @ApplicationScoped
-public class UserRepo implements IMongoRepo<User> {
+public class UserRepo extends AbsMongoRepo<User> {
   public Uni<Optional<User>> findByMetaId(String metaId) {
     return find("{'metaId': ?1}", metaId).singleResultOptional();
   }
