@@ -68,6 +68,8 @@ jobs:
     name: Deploy to Cloud Run
     runs-on: ubuntu-latest
     needs: code_quality_checks
+    outputs:
+      artifact_version: ${{ steps.gen_ver.outputs.artifact_version }}
     permissions:
       contents: read
       packages: write
@@ -92,6 +94,11 @@ jobs:
       - name: Generate native image
         run: mvn -B package -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.builder-image=${{ env.NATIVE_IMAGE_BUILDER }}
 
+      - name: Store artifact version
+        id: gen_ver
+        run: |
+          echo "artifact_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+
       - name: Google Auth
         id: gcp-auth
         uses: google-github-actions/auth@v0
@@ -107,13 +114,13 @@ jobs:
           username: 'oauth2accesstoken'
           password: ${{ steps.gcp-auth.outputs.access_token }}
 
-      - name: Check docker repository
+      - name: Check Docker repository
         id: repository_check
         continue-on-error: true  # will throw an error if repository does not exist
         run: |
           gcloud artifacts repositories describe ${{ env.GHUB_REPO_NAME }} --location ${{ env.REGION }}
 
-      - name: Create docker repository
+      - name: Create Docker repository
         if: ${{ steps.repository_check.outcome == 'failure' }}  # only create if previous step does not exist
         run: |
           gcloud artifacts repositories create ${{ env.GHUB_REPO_NAME }} --repository-format=docker --location ${{ env.REGION }}
@@ -129,10 +136,12 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ github.sha }}   # ${{ steps.meta.outputs.tags }} - (For public repositories like docker hub)
+          tags: | # ${{ steps.meta.outputs.tags }} - (For public repositories like docker hub)
+            ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ steps.gen_ver.outputs.artifact_version }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Deploy to Cloud Run
+      - name: Deploy to cloud run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
         with:
@@ -189,3 +198,42 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
         run: mvn -B deploy -Prelease-for-oss
+
+  pr_update:
+    name: Pull request update
+    if: always()
+    needs: [ pre_job, deploy_to_cloud ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # allows job to decorate PRs with analysis results
+    steps:
+      - name: Update PR (Skip message)
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ always() && needs.pre_job.outputs.should_skip == 'true' }}
+        with:
+          message: |
+            ⚪ Skipped CI/CD as deployment was done in a previous job
+
+      - name: Update PR (Success message)
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ always() && needs.pre_job.outputs.should_skip != 'true' && needs.deploy_to_cloud.outputs.artifact_version != '' }}
+        with:
+          message: |
+            ✅ Deployed to DEV environment: `${{ needs.deploy_to_cloud.outputs.artifact_version }}`
+
+            #### Add to your POM
+            ```xml
+            <dependency>
+              <groupId>com.abavilla</groupId>
+              <artifactId>${{ env.GHUB_REPO_NAME }}-lib</artifactId>
+              <version>${{ needs.deploy_to_cloud.outputs.artifact_version }}</version>
+            </dependency>
+            ```
+
+      - name: Update PR (Failure message)
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ always() && needs.pre_job.outputs.should_skip != 'true' && needs.deploy_to_cloud.outputs.artifact_version == '' }}
+        with:
+          message: |
+            ❌ CI Build & Deployment failed, please check the [logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details
