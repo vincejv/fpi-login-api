@@ -35,7 +35,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Data transfer object containing the information regarding the login session.
@@ -59,7 +58,7 @@ public class SessionDto extends AbsDto {
     /**
      * Ordinal id to enum mapping
      */
-    private static final Map<Integer, SessionStatus> ENUM_MAP = new HashMap<>();
+    private static final Map<Integer, IBaseEnum> ENUM_MAP = new HashMap<>();
 
     static {
       for(SessionStatus w : EnumSet.allOf(SessionStatus.class))
@@ -74,7 +73,7 @@ public class SessionDto extends AbsDto {
     /**
      * The enum value
      */
-    private String value;
+    private final String value;
 
     /**
      * Creates an enum based from given string value
@@ -83,22 +82,8 @@ public class SessionDto extends AbsDto {
      * @return the created enum
      */
     @JsonCreator
-    public static SessionStatus fromValue(String value) {
-      if (StringUtils.isBlank(value)) {
-        return null;
-      } else {
-        return ENUM_MAP.values().stream().filter(enumItem ->
-                StringUtils.equalsIgnoreCase(value, enumItem.getValue())).findAny()
-            .orElseGet(() -> {
-              var unknown = UNKNOWN;
-              String enumValue = value;
-              if (StringUtils.startsWithIgnoreCase(enumValue, UNKNOWN_PREFIX)) {
-                enumValue = StringUtils.removeStart(enumValue, UNKNOWN_PREFIX);
-              }
-              unknown.value = UNKNOWN_PREFIX + enumValue;
-              return unknown;
-            });
-      }
+    public static IBaseEnum fromValue(String value) {
+      return IBaseEnum.fromValue(value, ENUM_MAP, UNKNOWN);
     }
 
     /**
@@ -107,14 +92,8 @@ public class SessionDto extends AbsDto {
      * @param id the ordinal id
      * @return the created enum
      */
-    public static SessionStatus fromId(int id) {
-      return ENUM_MAP.values().stream().filter(enumItem ->
-              id == enumItem.getId()).findAny()
-          .orElseGet(() -> {
-            var unknown = UNKNOWN;
-            unknown.value = UNKNOWN_PREFIX + id;
-            return unknown;
-          });
+    public static IBaseEnum fromId(int id) {
+      return IBaseEnum.fromId(id, ENUM_MAP, UNKNOWN);
     }
 
     /**

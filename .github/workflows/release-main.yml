@@ -8,7 +8,7 @@ on:
 env:
   DEVELOPMENT_SYNC_BRANCH: development
   PROJECT_ID: fpi-sms-api
-  REGISTRY: asia.gcr.io
+  REGISTRY: asia-east1-docker.pkg.dev
   GHUB_REPO_NAME: fpi-login-api
   SERVICE: fpi-login-api-v1
   REGION: asia-east1
@@ -149,12 +149,23 @@ jobs:
           workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
           service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
 
-      - name: Login to Google Container Registry
+      - name: Login to Google Docker Registry
         uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: 'oauth2accesstoken'
           password: ${{ steps.gcp-auth.outputs.access_token }}
+
+      - name: Check docker repository
+        id: repository_check
+        continue-on-error: true  # will throw an error if repository does not exist
+        run: |
+          gcloud artifacts repositories describe ${{ env.GHUB_REPO_NAME }} --location ${{ env.REGION }}
+
+      - name: Create docker repository
+        if: ${{ steps.repository_check.outcome == 'failure' }}  # only create if previous step does not exist
+        run: |
+          gcloud artifacts repositories create ${{ env.GHUB_REPO_NAME }} --repository-format=docker --location ${{ env.REGION }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta

@@ -135,19 +135,4 @@ public class LoginSvc extends AbsRepoSvc<LoginDto, Session, SessionRepo> {
         .plusSeconds(auth.getExpiresIn()));
   }
 
-//  /**
-//   * {@inheritDoc}
-//   */
-//  @Override
-//  public SessionDto mapToDto(Session entity) {
-//    return mapper.mapToDto(entity);
-//  }
-//
-//  /**
-//   * {@inheritDoc}
-//   */
-//  @Override
-//  public Session mapToEntity(SessionDto dto) {
-//    return mapper.mapToEntity(dto);
-//  }
 }

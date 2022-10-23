@@ -75,40 +75,21 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
         user.setDateUpdated(DateUtil.now());
         user.setRegistrationDate(DateUtil.now());
         user.setLastAccess(DateUtil.now());
-        return repo.persist(user).map(ignored -> {
-          SessionDto sessionDto = new SessionDto();
-          sessionDto.setStatus(SessionDto.SessionStatus.CREATED_USER);
-          return sessionDto;
-        });
+        return repo.persist(user).map(ignored ->
+          mapSessionEntityToDto(new SessionDto(), SessionDto.SessionStatus.CREATED_USER));
       } else {
         // get registered user
         User user = authorizedUser.get();
         user.setLastAccess(DateUtil.now());
         user.setDateUpdated(DateUtil.now());
         if (user.getStatus() == UserStatus.VERIFIED) {
-          return repo.persistOrUpdate(user).chain(() -> {
-            return sessionRepo
-              .findByUsername(loginDto.getUsername()).chain(sessionOpt -> {
-                Session session = sessionOpt.orElse(new Session());
-                if (sessionOpt.isEmpty()) {
-                  // create a new session
-                  var tokenResponse = authzClient.obtainAccessToken(loginDto.getUsername(), trustedKey);
-                  mapLoginToSession(session, loginDto, tokenResponse);
-                  return sessionRepo.persistOrUpdate(session);
-                } else {
-                  if (!LoginUtil.verifyHash(trustedKey.toCharArray(), session.getPassword())) {
-                    throw new FPISvcEx("Incorrect login",
-                        RestResponse.StatusCode.UNAUTHORIZED);
-                  }
-                }
-                return Uni.createFrom().item(session);
-              })
-              .map(savedSession -> {
-                SessionDto sessionDto = mapper.mapToDto(savedSession);
-                sessionDto.setStatus(SessionDto.SessionStatus.ESTABLISHED);
-                return sessionDto;
-              });
-          }).onFailure(DuplicateKeyException.class).retry().withBackOff(
+          return repo.persistOrUpdate(user).chain(() ->
+            sessionRepo
+              .findByUsername(loginDto.getUsername()).chain(sessionOpt ->
+                createSession(loginDto, sessionOpt.orElse(new Session()), sessionOpt.isEmpty()))
+              .map(savedSession ->
+                mapSessionEntityToDto(mapper.mapToDto(savedSession), SessionDto.SessionStatus.ESTABLISHED))
+          ).onFailure(DuplicateKeyException.class).retry().withBackOff(
               Duration.ofSeconds(3)).withJitter(0.2).indefinitely();
         } else {
           throw new FPISvcEx("User not yet verified yet",
@@ -116,6 +97,27 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
         }
       }
     });
+  }
+
+  private SessionDto mapSessionEntityToDto(SessionDto mapper, SessionDto.SessionStatus established) {
+    mapper.setStatus(established);
+    return mapper;
+  }
+
+  private Uni<Session> createSession(WebhookLoginDto loginDto, Session session, boolean foundExistingSession) {
+    if (!foundExistingSession) {
+      // create a new session
+      var tokenResponse = authzClient.obtainAccessToken(loginDto.getUsername(), trustedKey);
+      mapLoginToSession(session, loginDto, tokenResponse);
+      return sessionRepo.persistOrUpdate(session);
+    } else {
+      // validate existing session
+      if (!LoginUtil.verifyHash(trustedKey.toCharArray(), session.getPassword())) {
+        throw new FPISvcEx("Incorrect login",
+            RestResponse.StatusCode.UNAUTHORIZED);
+      }
+    }
+    return Uni.createFrom().item(session);
   }
 
   /**
