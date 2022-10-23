@@ -24,6 +24,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import com.abavilla.fpi.fw.controller.AbsBaseResource;
+import com.abavilla.fpi.fw.dto.IDto;
 import com.abavilla.fpi.fw.dto.impl.RespDto;
 import com.abavilla.fpi.fw.exceptions.FPISvcEx;
 import com.abavilla.fpi.fw.util.HttpUtil;
@@ -78,7 +79,7 @@ public class LoginResource extends AbsBaseResource<LoginDto, Session, LoginSvc> 
    */
   @Override
   @ServerExceptionMapper
-  protected RestResponse<RespDto<Object>> mapException(FPISvcEx x) {
+  protected RestResponse<RespDto<IDto>> mapException(FPISvcEx x) {
     return super.mapException(x);
   }
 

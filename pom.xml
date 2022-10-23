@@ -16,7 +16,24 @@
   ~ You should have received a copy of the GNU General Public License         ~
   ~ along with this program.  If not, see <https://www.gnu.org/licenses />.    ~
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <licenses>
+    <license>
+      <name>The GNU General Public License v3.0</name>
+      <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Vince Jerald Villamora</name>
+      <email>vincevillamora@gmail.com</email>
+      <organization>Abavilla</organization>
+      <organizationUrl>https://github.com/vincejv</organizationUrl>
+    </developer>
+  </developers>
+
   <scm>
     <url>https://github.com/vincejv/fpi-login-api</url>
     <connection>scm:git:git://github.com/vincejv/fpi-login-api.git</connection>
@@ -24,16 +41,20 @@
     <tag>HEAD</tag>
   </scm>
 
+  <name>FPI Login API parent POM</name>
+  <description>Reactive backend REST login authentication API for FPI System</description>
+  <url>https://github.com/vincejv/fpi-login-api</url>
+  <inceptionYear>2022</inceptionYear>
+
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fpi-login-api</artifactId>
-  <name>fpi-login-api</name>
-  <version>1.0.21-SNAPSHOT</version>
+  <version>0</version>
   <packaging>pom</packaging>
 
   <parent>
     <groupId>com.abavilla</groupId>
     <artifactId>fpi-framework-pom</artifactId>
-    <version>1.0.112</version>
+    <version>1.1.20</version>
   </parent>
 
   <modules>
@@ -44,14 +65,6 @@
   <properties>
 
   </properties>
-
-  <repositories>
-    <repository>
-      <id>github</id>
-      <name>Github FPI Framework Apache Maven Packages</name>
-      <url>https://maven.pkg.github.com/vincejv/fpi-framework</url>
-    </repository>
-  </repositories>
 
   <dependencyManagement>
     <dependencies>
@@ -70,13 +83,5 @@
 
     </dependencies>
   </dependencyManagement>
-
-  <distributionManagement>
-    <repository>
-      <id>github</id>
-      <name>Github FPI Framework Apache Maven Packages</name>
-      <url>https://maven.pkg.github.com/vincejv/fpi-login-api</url>
-    </repository>
-  </distributionManagement>
 
 </project>

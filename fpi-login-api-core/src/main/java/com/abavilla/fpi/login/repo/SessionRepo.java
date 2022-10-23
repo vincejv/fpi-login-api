@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import com.abavilla.fpi.fw.repo.IMongoRepo;
+import com.abavilla.fpi.fw.repo.AbsMongoRepo;
 import com.abavilla.fpi.login.entity.Session;
 import io.smallrye.mutiny.Uni;
 
@@ -32,7 +32,7 @@ import io.smallrye.mutiny.Uni;
  * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
  */
 @ApplicationScoped
-public class SessionRepo implements IMongoRepo<Session> {
+public class SessionRepo extends AbsMongoRepo<Session> {
 
   /**
    * Finds an existing active session by username

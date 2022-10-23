@@ -1,0 +1,180 @@
+name: GCP Cloud Run CI Dev
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+env:
+  PROJECT_ID: fpi-sms-api
+  REGISTRY: asia.gcr.io
+  GHUB_REPO_NAME: fpi-login-api
+  SERVICE: fpi-login-api-dev
+  REGION: asia-east1
+  SONAR_PROJECT_KEY: vincejv_fpi-login-api
+  NATIVE_IMAGE_BUILDER: quay.io/quarkus/ubi-quarkus-mandrel:22.2-java17
+  SERVICE_CPU: 1000m
+  SERVICE_MEMORY: 384Mi
+  SERVICE_ENV: dev
+
+jobs:
+
+  pre_job:
+    name: Duplicate checks
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'docs-update(') }} # skip for commits containing 'docs-update('
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+      paths_result: ${{ steps.skip_check.outputs.paths_result }}
+    steps:
+      - name: Skip duplicate actions
+        id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          concurrent_skipping: outdated_runs
+          cancel_others: true
+
+  code_quality_checks:
+    name: Code quality checks
+    runs-on: ubuntu-latest
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }} -Dsonar.qualitygate.wait=true
+
+  deploy_to_cloud:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    needs: code_quality_checks
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    environment: Development
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # for jgitver to generate the version
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Generate native image
+        run: mvn -B package -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.builder-image=${{ env.NATIVE_IMAGE_BUILDER }}
+
+      - name: Google Auth
+        id: gcp-auth
+        uses: google-github-actions/auth@v0
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
+
+      - name: Login to Google Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: 'oauth2accesstoken'
+          password: ${{ steps.gcp-auth.outputs.access_token }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ github.sha }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ github.sha }}   # ${{ steps.meta.outputs.tags }} - (For public repositories like docker hub)
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          service: ${{ env.SERVICE }}
+          region: ${{ env.REGION }}
+          image: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ github.sha }}
+          project_id: ${{ env.PROJECT_ID }}
+          flags: --cpu ${{ env.SERVICE_CPU }} --memory ${{ env.SERVICE_MEMORY }}
+          env_vars: |
+            OIDC_CLIENT_ID=${{ secrets.OIDC_CLIENT_ID }}
+            OIDC_AUTH_URL=${{ secrets.OIDC_AUTH_URL }}
+          secrets: |
+            MONGO_CONN_STRING=vbl_mongo_connection_string:latest
+            OIDC_SECRET=oidc_secret_keycloak:latest
+            FPI_APP_TO_APP_TRUSTED_KEY=fpi_app_to_app_trusted_key:latest
+          labels: |
+            env=${{ env.SERVICE_ENV }}
+
+      - name: Configure cloud run
+        run: |-
+          gcloud run services add-iam-policy-binding ${{ env.SERVICE }} --member=allUsers --role=roles/run.invoker --region=${{ env.REGION }}          
+
+      - name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}
+
+  deploy_to_central:
+    name: Release artifact to central
+    runs-on: ubuntu-latest
+    needs: deploy_to_cloud  # only deploy to central if successfully deployed to cloud run environment
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Build and release to central repo
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: mvn -B deploy -Prelease-for-oss
