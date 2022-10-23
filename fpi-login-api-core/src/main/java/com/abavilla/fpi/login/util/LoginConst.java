@@ -21,6 +21,10 @@ package com.abavilla.fpi.login.util;
 /**
  * Constants used for Login API Service.
  */
-public abstract class LoginConst {
+public final class LoginConst {
   public static final String INVALID_USER_CREDENTIALS = "Invalid user credentials";
+
+  private LoginConst() {
+    // constants class
+  }
 }

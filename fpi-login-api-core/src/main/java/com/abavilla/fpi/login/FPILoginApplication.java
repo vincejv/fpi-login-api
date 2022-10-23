@@ -19,10 +19,8 @@
 package com.abavilla.fpi.login;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import com.abavilla.fpi.fw.FPIApplication;
-import com.abavilla.fpi.login.util.LoginUtil;
 
 /**
  * Application starting point
@@ -32,17 +30,4 @@ import com.abavilla.fpi.login.util.LoginUtil;
 @ApplicationScoped
 public class FPILoginApplication extends FPIApplication {
 
-  /**
-   * Utility method used by Login API Service
-   */
-  @Inject
-  LoginUtil loginUtil;
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void postStart() {
-    loginUtil.init();
-  }
 }

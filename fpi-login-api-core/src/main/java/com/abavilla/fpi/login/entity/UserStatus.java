@@ -29,10 +29,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
-@Getter
 @AllArgsConstructor
+@Getter
 public enum UserStatus implements IBaseEnum {
   UNKNOWN(-1, UNKNOWN_PREFIX),
   PENDING(1, "Pending verification"),
@@ -42,7 +41,7 @@ public enum UserStatus implements IBaseEnum {
   /**
    * Ordinal id to enum mapping
    */
-  private static final Map<Integer, UserStatus> ENUM_MAP = new HashMap<>();
+  private static final Map<Integer, IBaseEnum> ENUM_MAP = new HashMap<>();
 
   static {
     for(UserStatus w : EnumSet.allOf(UserStatus.class))
@@ -66,22 +65,8 @@ public enum UserStatus implements IBaseEnum {
    * @return the created enum
    */
   @JsonCreator
-  public static UserStatus fromValue(String value) {
-    if (StringUtils.isBlank(value)) {
-      return null;
-    } else {
-      return ENUM_MAP.values().stream().filter(enumItem ->
-              StringUtils.equalsIgnoreCase(value, enumItem.getValue())).findAny()
-          .orElseGet(() -> {
-            var unknown = UNKNOWN;
-            String enumValue = value;
-            if (StringUtils.startsWithIgnoreCase(enumValue, UNKNOWN_PREFIX)) {
-              enumValue = StringUtils.removeStart(enumValue, UNKNOWN_PREFIX);
-            }
-            unknown.value = UNKNOWN_PREFIX + enumValue;
-            return unknown;
-          });
-    }
+  public static IBaseEnum fromValue(String value) {
+    return IBaseEnum.fromValue(value, ENUM_MAP, UNKNOWN);
   }
 
   /**
@@ -90,14 +75,8 @@ public enum UserStatus implements IBaseEnum {
    * @param id the ordinal id
    * @return the created enum
    */
-  public static UserStatus fromId(int id) {
-    return ENUM_MAP.values().stream().filter(enumItem ->
-            id == enumItem.getId()).findAny()
-        .orElseGet(() -> {
-          var unknown = UNKNOWN;
-          unknown.value = UNKNOWN_PREFIX + id;
-          return unknown;
-        });
+  public static IBaseEnum fromId(int id) {
+    return IBaseEnum.fromId(id, ENUM_MAP, UNKNOWN);
   }
 
   /**
@@ -108,4 +87,5 @@ public enum UserStatus implements IBaseEnum {
   public String toString() {
     return value;
   }
+  
 }
