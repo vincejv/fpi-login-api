@@ -86,7 +86,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
           return repo.persistOrUpdate(user).chain(() ->
             sessionRepo
               .findByUsername(loginDto.getUsername()).chain(sessionOpt ->
-                createSession(loginDto, sessionOpt.orElse(new Session()), sessionOpt.isEmpty()))
+                createSession(loginDto, sessionOpt.orElse(new Session()), sessionOpt.isPresent()))
               .map(savedSession ->
                 mapSessionEntityToDto(mapper.mapToDto(savedSession), SessionDto.SessionStatus.ESTABLISHED))
           ).onFailure(DuplicateKeyException.class).retry().withBackOff(
