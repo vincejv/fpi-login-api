@@ -24,6 +24,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.QueryParam;
 
 import com.abavilla.fpi.fw.dto.impl.RespDto;
+import com.abavilla.fpi.fw.rest.IApi;
 import com.abavilla.fpi.login.ext.dto.UserDto;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
@@ -31,7 +32,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @RegisterRestClient(configKey = "user-api")
 @RegisterClientHeaders(AppToAppPreAuth.class)
-public interface UserApi {
+public interface UserApi extends IApi {
 
   /**
    * Retrieves {@link UserDto} given the user's {@code metaId}.
