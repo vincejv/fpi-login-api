@@ -23,7 +23,6 @@ package com.abavilla.fpi.login.ext.rest;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
-import com.abavilla.fpi.fw.annotation.HandleRestEx;
 import com.abavilla.fpi.fw.dto.impl.RespDto;
 import com.abavilla.fpi.fw.rest.IApi;
 import com.abavilla.fpi.login.ext.dto.SessionDto;
@@ -34,7 +33,6 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @RegisterRestClient(configKey = "login-api")
 @RegisterClientHeaders(AppToAppPreAuth.class)
-@HandleRestEx
 public interface TrustedLoginApi extends IApi {
 
   /**
