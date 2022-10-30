@@ -24,15 +24,18 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import com.abavilla.fpi.fw.dto.impl.RespDto;
+import com.abavilla.fpi.fw.exceptions.handler.ApiRepoExHandler;
 import com.abavilla.fpi.fw.rest.IApi;
 import com.abavilla.fpi.login.ext.dto.SessionDto;
 import com.abavilla.fpi.login.ext.dto.WebhookLoginDto;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
+import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @RegisterRestClient(configKey = "login-api")
 @RegisterClientHeaders(AppToAppPreAuth.class)
+@RegisterProvider(value = ApiRepoExHandler.class)
 public interface TrustedLoginApi extends IApi {
 
   /**

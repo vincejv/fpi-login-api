@@ -22,13 +22,16 @@ package com.abavilla.fpi.login.ext.rest;
 
 import javax.ws.rs.POST;
 
+import com.abavilla.fpi.fw.exceptions.handler.ApiRepoExHandler;
 import com.abavilla.fpi.fw.rest.IApi;
 import com.abavilla.fpi.login.ext.dto.LoginDto;
 import com.abavilla.fpi.login.ext.dto.SessionDto;
 import io.smallrye.mutiny.Uni;
+import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @RegisterRestClient(configKey = "login-api")
+@RegisterProvider(value = ApiRepoExHandler.class)
 public interface LoginApi extends IApi {
 
   /**
