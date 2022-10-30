@@ -26,12 +26,14 @@ import java.util.Map;
 
 import com.abavilla.fpi.fw.entity.enums.IBaseEnum;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, defaultImpl = UserStatus.class)
 public enum UserStatus implements IBaseEnum {
   UNKNOWN(-1, UNKNOWN_PREFIX),
   PENDING(1, "Pending verification"),
