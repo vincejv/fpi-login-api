@@ -35,7 +35,8 @@ import com.abavilla.fpi.login.mapper.SessionMapper;
 import com.abavilla.fpi.login.repo.SessionRepo;
 import com.abavilla.fpi.login.util.LoginConst;
 import com.abavilla.fpi.login.util.LoginUtil;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.ErrorCategory;
+import com.mongodb.MongoWriteException;
 import io.smallrye.mutiny.Uni;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.util.HttpResponseException;
@@ -89,7 +90,9 @@ public class LoginSvc extends AbsRepoSvc<LoginDto, Session, SessionRepo> {
             new NotAuthorizedException(LoginConst.INVALID_USER_CREDENTIALS));
       }
     })
-    .onFailure(DuplicateKeyException.class).retry().withBackOff(
+    .onFailure(ex -> ex instanceof MongoWriteException wEx &&
+        wEx.getError().getCategory().equals(ErrorCategory.DUPLICATE_KEY))
+    .retry().withBackOff(
       Duration.ofSeconds(3)).withJitter(0.2).indefinitely()
     .map(mapper::mapToDto);
   }
