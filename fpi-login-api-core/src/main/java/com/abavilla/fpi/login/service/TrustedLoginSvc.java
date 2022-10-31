@@ -89,14 +89,14 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
                 createSession(loginDto, sessionOpt.orElse(new Session()), sessionOpt.isPresent()))
               .map(savedSession ->
                 mapSessionEntityToDto(mapper.mapToDto(savedSession), SessionDto.SessionStatus.ESTABLISHED))
-          );
+          ).onFailure(DuplicateKeyException.class).retry().withBackOff(
+              Duration.ofSeconds(3)).withJitter(0.2).indefinitely();
         } else {
           throw new FPISvcEx("User not yet verified yet",
               Response.Status.FORBIDDEN.getStatusCode());
         }
       }
-    }).onFailure(DuplicateKeyException.class).retry().withBackOff(
-      Duration.ofSeconds(3)).withJitter(0.2).indefinitely();
+    });
   }
 
   private SessionDto mapSessionEntityToDto(SessionDto mapper, SessionDto.SessionStatus established) {
