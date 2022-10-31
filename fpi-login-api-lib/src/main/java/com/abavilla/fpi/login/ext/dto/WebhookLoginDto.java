@@ -18,7 +18,6 @@
 
 package com.abavilla.fpi.login.ext.dto;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,7 +27,6 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @RegisterForReflection
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, defaultImpl = WebhookLoginDto.class)
 public class WebhookLoginDto extends LoginDto {
   private String mobile;
 }

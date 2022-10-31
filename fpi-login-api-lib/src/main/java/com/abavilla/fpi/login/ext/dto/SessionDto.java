@@ -28,7 +28,6 @@ import com.abavilla.fpi.fw.dto.AbsDto;
 import com.abavilla.fpi.fw.entity.enums.IBaseEnum;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.AllArgsConstructor;
@@ -46,7 +45,6 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @RegisterForReflection
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, defaultImpl = SessionDto.class)
 public class SessionDto extends AbsDto {
 
   @Getter
