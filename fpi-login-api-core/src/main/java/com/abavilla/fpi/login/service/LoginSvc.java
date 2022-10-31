@@ -18,6 +18,7 @@
 
 package com.abavilla.fpi.login.service;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -34,6 +35,7 @@ import com.abavilla.fpi.login.mapper.SessionMapper;
 import com.abavilla.fpi.login.repo.SessionRepo;
 import com.abavilla.fpi.login.util.LoginConst;
 import com.abavilla.fpi.login.util.LoginUtil;
+import com.mongodb.DuplicateKeyException;
 import io.smallrye.mutiny.Uni;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.util.HttpResponseException;
@@ -70,14 +72,12 @@ public class LoginSvc extends AbsRepoSvc<LoginDto, Session, SessionRepo> {
     return byUsername.chain(sessionOpt -> {
       if (sessionOpt.isEmpty()) {
         AccessTokenResponse auth = null;
-
         try {
           auth = authzClient.obtainAccessToken(login.getUsername(), login.getPassword());
         } catch (HttpResponseException ex) {
           return Uni.createFrom().failure(
               new NotAuthorizedException(LoginConst.INVALID_USER_CREDENTIALS));
         }
-
         Session newSession = new Session();
         mapLoginToSession(newSession, login, auth);
         return repo.persist(newSession);
@@ -88,7 +88,10 @@ public class LoginSvc extends AbsRepoSvc<LoginDto, Session, SessionRepo> {
         return Uni.createFrom().failure(
             new NotAuthorizedException(LoginConst.INVALID_USER_CREDENTIALS));
       }
-    }).map(mapper::mapToDto);
+    })
+    .map(mapper::mapToDto)
+    .onFailure(DuplicateKeyException.class).retry().withBackOff(
+      Duration.ofSeconds(3)).withJitter(0.2).indefinitely();
   }
 
   /**
