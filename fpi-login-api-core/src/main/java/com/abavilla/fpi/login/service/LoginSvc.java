@@ -89,9 +89,9 @@ public class LoginSvc extends AbsRepoSvc<LoginDto, Session, SessionRepo> {
             new NotAuthorizedException(LoginConst.INVALID_USER_CREDENTIALS));
       }
     })
-    .map(mapper::mapToDto)
     .onFailure(DuplicateKeyException.class).retry().withBackOff(
-      Duration.ofSeconds(3)).withJitter(0.2).indefinitely();
+      Duration.ofSeconds(3)).withJitter(0.2).indefinitely()
+    .map(mapper::mapToDto);
   }
 
   /**
