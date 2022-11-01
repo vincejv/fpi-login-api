@@ -38,6 +38,7 @@ import com.abavilla.fpi.login.util.LoginUtil;
 import com.mongodb.ErrorCategory;
 import com.mongodb.MongoWriteException;
 import io.smallrye.mutiny.Uni;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.util.HttpResponseException;
 import org.keycloak.representations.AccessTokenResponse;
@@ -49,6 +50,9 @@ import org.keycloak.representations.AccessTokenResponse;
  */
 @ApplicationScoped
 public class LoginSvc extends AbsRepoSvc<LoginDto, Session, SessionRepo> {
+
+  @ConfigProperty(name = "session.grace-period")
+  Long tokenGracePeriod;
 
   /**
    * Client used for authorizing with Keycloak server.
@@ -138,7 +142,7 @@ public class LoginSvc extends AbsRepoSvc<LoginDto, Session, SessionRepo> {
     session.setIpAddress(login.getRemoteAddress());
     session.setUserAgent(login.getUserAgent());
     session.setRefreshTokenExpiry(DateUtil.now()
-        .plusSeconds(auth.getExpiresIn()));
+        .plusSeconds(auth.getExpiresIn() - tokenGracePeriod));
   }
 
 }

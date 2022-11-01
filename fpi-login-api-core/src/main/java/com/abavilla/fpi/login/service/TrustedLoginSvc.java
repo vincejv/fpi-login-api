@@ -51,6 +51,9 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
   @ConfigProperty(name = "fpi.app-to-app.auth.trusted-key")
   String trustedKey;
 
+  @ConfigProperty(name = "session.grace-period")
+  Long tokenGracePeriod;
+
   @Inject
   SessionRepo sessionRepo;
 
@@ -139,7 +142,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
     session.setRefreshToken(auth.getRefreshToken());
     session.setDateCreated(DateUtil.now());
     session.setRefreshTokenExpiry(DateUtil.now()
-        .plusSeconds(auth.getExpiresIn()));
+        .plusSeconds(auth.getExpiresIn() - tokenGracePeriod));
   }
 
 }

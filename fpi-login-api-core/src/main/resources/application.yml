@@ -27,6 +27,9 @@ quarkus:
           path: /fpi/login
           enforcement-mode: DISABLED
 
+session:
+  grace-period: 60 # cut off time for token to be usable
+
 fpi:
   app-to-app:
     auth:
