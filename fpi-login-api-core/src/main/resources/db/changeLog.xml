@@ -1,0 +1,25 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+  <changeSet id="1" author="vincejv" labels="login_api" context="main">
+    <comment>initial login api schema</comment>
+    <ext:createCollection collectionName="login_sessions"/>
+    <ext:createCollection collectionName="system_users"/>
+
+    <ext:createIndex collectionName="login_sessions">
+      <ext:keys>{username: 1}</ext:keys>
+      <ext:options>{unique: true, name: "username"}</ext:options> <!-- every customer name is unique -->
+    </ext:createIndex>
+    <ext:createIndex collectionName="login_sessions">
+      <ext:keys>{refreshTokenExpiry: 1}</ext:keys>
+      <ext:options>{name: "tokenExpiration", expireAfterSeconds: 0}</ext:options>
+    </ext:createIndex>
+
+  </changeSet>
+
+</databaseChangeLog>
