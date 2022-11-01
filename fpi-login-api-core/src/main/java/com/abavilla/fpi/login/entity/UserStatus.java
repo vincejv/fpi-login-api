@@ -56,7 +56,7 @@ public enum UserStatus implements IBaseEnum {
   /**
    * The enum value
    */
-  private String value;
+  private final String value;
 
   /**
    * Creates an enum based from given string value
@@ -64,9 +64,9 @@ public enum UserStatus implements IBaseEnum {
    * @param value the string value
    * @return the created enum
    */
-  @JsonCreator
-  public static IBaseEnum fromValue(String value) {
-    return IBaseEnum.fromValue(value, ENUM_MAP, UNKNOWN);
+  @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+  public static UserStatus fromValue(String value) {
+    return (UserStatus) IBaseEnum.fromValue(value, ENUM_MAP, UNKNOWN);
   }
 
   /**
@@ -75,8 +75,8 @@ public enum UserStatus implements IBaseEnum {
    * @param id the ordinal id
    * @return the created enum
    */
-  public static IBaseEnum fromId(int id) {
-    return IBaseEnum.fromId(id, ENUM_MAP, UNKNOWN);
+  public static UserStatus fromId(int id) {
+    return (UserStatus) IBaseEnum.fromId(id, ENUM_MAP, UNKNOWN);
   }
 
   /**

@@ -24,7 +24,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
-import com.abavilla.fpi.fw.controller.AbsReadOnlyResource;
+import com.abavilla.fpi.fw.controller.AbsBaseResource;
 import com.abavilla.fpi.fw.dto.IDto;
 import com.abavilla.fpi.fw.dto.impl.RespDto;
 import com.abavilla.fpi.fw.exceptions.FPISvcEx;
@@ -43,7 +43,7 @@ import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
  * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
  */
 @Path("/fpi/user")
-public class UserResource extends AbsReadOnlyResource<UserDto, User, UserSvc> {
+public class UserResource extends AbsBaseResource<UserDto, User, UserSvc> {
 
   /**
    * Retrieves {@link UserDto} given the user's {@code metaId}.

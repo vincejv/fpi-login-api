@@ -21,6 +21,7 @@ package com.abavilla.fpi.login.controller;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import com.abavilla.fpi.fw.controller.AbsBaseResource;
 import com.abavilla.fpi.fw.dto.IDto;
@@ -51,13 +52,17 @@ public class TrustedLoginResource extends AbsBaseResource<LoginDto, User, Truste
   @Path("trusted")
   public Uni<RestResponse<RespDto<SessionDto>>> loginFromTrustedIdentityProvider(
       WebhookLoginDto loginDto,
-      @QueryParam("refreshToken")Boolean refreshToken){
+      @QueryParam("refreshToken")Boolean refreshToken) {
+    RespDto<SessionDto> resp = new RespDto<>();
+    resp.setTimestamp(DateUtil.nowAsStr());
     return service.authorizedLogin(loginDto).map(sessionDto -> {
-      RespDto<SessionDto> resp = new RespDto<>();
       resp.setStatus(String.valueOf(sessionDto.getStatus()));
-      resp.setTimestamp(DateUtil.nowAsStr());
       resp.setResp(sessionDto);
       return RestResponse.ok(resp);
+    })
+    .onFailure().recoverWithItem(throwable -> {
+      resp.setError(throwable.getMessage());
+      return RestResponse.status(Response.Status.UNAUTHORIZED, resp);
     });
   }
 

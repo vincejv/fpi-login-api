@@ -81,9 +81,9 @@ public class SessionDto extends AbsDto {
      * @param value the string value
      * @return the created enum
      */
-    @JsonCreator
-    public static IBaseEnum fromValue(String value) {
-      return IBaseEnum.fromValue(value, ENUM_MAP, UNKNOWN);
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static SessionStatus fromValue(String value) {
+      return (SessionStatus) IBaseEnum.fromValue(value, ENUM_MAP, UNKNOWN);
     }
 
     /**
@@ -92,8 +92,8 @@ public class SessionDto extends AbsDto {
      * @param id the ordinal id
      * @return the created enum
      */
-    public static IBaseEnum fromId(int id) {
-      return IBaseEnum.fromId(id, ENUM_MAP, UNKNOWN);
+    public static SessionStatus fromId(int id) {
+      return (SessionStatus) IBaseEnum.fromId(id, ENUM_MAP, UNKNOWN);
     }
 
     /**
