@@ -18,6 +18,7 @@
 
 package com.abavilla.fpi.login.service;
 
+import java.io.IOException;
 import java.time.Duration;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -91,6 +92,8 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
             sessionRepo
               .findByUsername(loginDto.getUsername()).chain(sessionOpt ->
                 createSession(loginDto, sessionOpt.orElse(new Session()), sessionOpt.isPresent()))
+              .onFailure(IOException.class).retry().withBackOff(
+                Duration.ofSeconds(3)).withJitter(0.2).atMost(5)
               .map(savedSession ->
                 mapSessionEntityToDto(mapper.mapToDto(savedSession), SessionDto.SessionStatus.ESTABLISHED))
           );
