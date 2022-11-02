@@ -18,6 +18,7 @@
 
 package com.abavilla.fpi.login.service;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -98,6 +99,8 @@ public class LoginSvc extends AbsRepoSvc<LoginDto, Session, SessionRepo> {
         wEx.getError().getCategory().equals(ErrorCategory.DUPLICATE_KEY))
     .retry().withBackOff(
       Duration.ofSeconds(3)).withJitter(0.2).indefinitely()
+    .onFailure(IOException.class).retry().withBackOff(
+      Duration.ofSeconds(3)).withJitter(0.2).atMost(5)
     .map(mapper::mapToDto);
   }
 
@@ -122,7 +125,14 @@ public class LoginSvc extends AbsRepoSvc<LoginDto, Session, SessionRepo> {
       Session session = sessionOpt.orElse(new Session());
       mapLoginToSession(session, login, auth);
       return repo.persistOrUpdate(session);
-    }).map(mapper::mapToDto);
+    })
+    .onFailure(ex -> ex instanceof MongoWriteException wEx &&
+      wEx.getError().getCategory().equals(ErrorCategory.DUPLICATE_KEY))
+    .retry().withBackOff(
+      Duration.ofSeconds(3)).withJitter(0.2).indefinitely()
+    .onFailure(IOException.class).retry().withBackOff(
+      Duration.ofSeconds(3)).withJitter(0.2).atMost(5)
+    .map(mapper::mapToDto);
   }
 
   /**
