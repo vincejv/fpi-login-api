@@ -45,6 +45,16 @@ public class User extends AbsMongoItem {
   private String metaId;
 
   /**
+   * User id in Telegram
+   */
+  private String telegramId;
+
+  /**
+   * User id in Viber
+   */
+  private String viberId;
+
+  /**
    * Mobile number
    */
   private String mobile;

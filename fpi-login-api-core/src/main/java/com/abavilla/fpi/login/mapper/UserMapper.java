@@ -20,12 +20,20 @@
 
 package com.abavilla.fpi.login.mapper;
 
+import com.abavilla.fpi.bot.ext.entity.enums.BotSource;
 import com.abavilla.fpi.fw.mapper.IDtoToEntityMapper;
 import com.abavilla.fpi.login.entity.User;
 import com.abavilla.fpi.login.ext.dto.UserDto;
+import com.abavilla.fpi.login.ext.dto.WebhookLoginDto;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Condition;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 /**
  * Mapper used for converting between {@link UserDto} and {@link User} entity
@@ -35,4 +43,23 @@ import org.mapstruct.MappingConstants;
 @Mapper(componentModel = MappingConstants.ComponentModel.CDI,
   injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface UserMapper extends IDtoToEntityMapper<UserDto, User> {
+
+  @BeanMapping(ignoreByDefault = true,
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  @Mapping(target = "metaId", source = "username",  conditionQualifiedByName = "isMetaId")
+  @Mapping(target = "telegramId", source = "username",  conditionQualifiedByName = "isTelegramId")
+  void mapLoginToUser(@MappingTarget User user, WebhookLoginDto login);
+
+  @Named("isMetaId")
+  @Condition
+  default boolean isMetaId(WebhookLoginDto login) {
+    return BotSource.fromValue(login.getBotSource()) == BotSource.FB_MSGR;
+  }
+
+  @Named("isTelegramId")
+  @Condition
+  default boolean isTelegramId(WebhookLoginDto login) {
+    return BotSource.fromValue(login.getBotSource()) == BotSource.TELEGRAM;
+  }
+
 }

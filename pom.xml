@@ -81,6 +81,12 @@
         <version>0.9.0</version>
       </dependency>
 
+      <dependency>
+        <groupId>com.abavilla</groupId>
+        <artifactId>fpi-bot-api-lib</artifactId>
+        <version>1.1.0-46fea89-SNAPSHOT</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

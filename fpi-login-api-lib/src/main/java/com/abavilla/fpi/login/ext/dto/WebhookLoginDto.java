@@ -28,5 +28,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @RegisterForReflection
 public class WebhookLoginDto extends LoginDto {
+
+  private String botSource;
+
   private String mobile;
+
 }
