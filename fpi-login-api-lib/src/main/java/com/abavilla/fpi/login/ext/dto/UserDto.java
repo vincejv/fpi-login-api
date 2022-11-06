@@ -43,6 +43,16 @@ public class UserDto extends AbsDto {
   private String metaId;
 
   /**
+   * User id in Telegram
+   */
+  private String telegramId;
+
+  /**
+   * User id in Viber
+   */
+  private String viberId;
+
+  /**
    * Mobile number
    */
   private String mobile;
