@@ -70,8 +70,8 @@ public class UserSvc extends AbsRepoSvc<UserDto, User, UserRepo> {
       if (user.isPresent()) {
         return Uni.createFrom().item(this.mapToDto(user.get()));
       }
-      throw new FPISvcEx(String.format("User with metaId %s was not found",
-        RestResponse.StatusCode.NOT_FOUND));
+      throw new FPISvcEx(String.format("User with metaId %s was not found", metaId),
+        RestResponse.StatusCode.NOT_FOUND);
     });
   }
 }
