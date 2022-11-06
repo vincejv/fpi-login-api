@@ -101,7 +101,6 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
       } else {
         // get registered user
         User user = authorizedUser.get();
-        userMapper.mapLoginToUser(user, loginDto);
         user.setLastAccess(DateUtil.now());
         user.setDateUpdated(DateUtil.now());
         if (user.getStatus() == UserStatus.VERIFIED) {
