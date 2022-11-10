@@ -107,6 +107,11 @@ public class SessionDto extends AbsDto {
   }
 
   /**
+   * Username used by session
+   */
+  private String username;
+
+  /**
    * Token to be used for authenticating against protected resource
    */
   private String accessToken;

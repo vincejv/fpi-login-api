@@ -33,6 +33,7 @@ import com.abavilla.fpi.login.entity.User;
 import com.abavilla.fpi.login.ext.dto.UserDto;
 import com.abavilla.fpi.login.service.UserSvc;
 import io.smallrye.mutiny.Uni;
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
@@ -46,14 +47,23 @@ import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 public class UserResource extends AbsBaseResource<UserDto, User, UserSvc> {
 
   /**
-   * Retrieves {@link UserDto} given the user's {@code metaId}.
+   * Retrieves {@link UserDto} given the user's {@code metaId} or {@code userId}, if multiple id's are given,
+   * prioritizes the specific platform id
    *
    * @param metaId the meta id
+   * @param userId the user id
    * @return {@link UserDto}
    */
   @GET
-  public Uni<RespDto<UserDto>> getByMetaId(@QueryParam("metaId") String metaId) {
-    return service.getByMetaId(metaId).map(user -> {
+  public Uni<RespDto<UserDto>> getById(@QueryParam("metaId") String metaId,
+                                           @QueryParam("id") String userId) {
+    Uni<UserDto> userLookup;
+    if (StringUtils.isNotBlank(metaId)) {
+      userLookup = service.getByMetaId(metaId);
+    } else {
+      userLookup = service.get(userId);
+    }
+    return userLookup.map(user -> {
       RespDto<UserDto> resp = new RespDto<>();
       resp.setTimestamp(DateUtil.nowAsStr());
       resp.setResp(user);
