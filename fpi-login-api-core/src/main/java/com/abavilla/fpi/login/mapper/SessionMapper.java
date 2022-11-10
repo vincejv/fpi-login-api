@@ -28,7 +28,6 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
-import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 
 /**
@@ -40,19 +39,15 @@ import org.mapstruct.Named;
     injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface SessionMapper extends IDtoToEntityMapper<SessionDto, Session> {
 
-  @Mappings(value = {
-      @Mapping(target = "dateCreated", ignore = true),
-      @Mapping(target = "dateUpdated", ignore = true),
-      @Mapping(target = "id", ignore = true),
-      @Mapping(target = "tokenExpiry", source = "refreshTokenExpiry", qualifiedByName = "ldtToUtcStr")
-  })
+  @Mapping(target = "dateCreated", ignore = true)
+  @Mapping(target = "dateUpdated", ignore = true)
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "tokenExpiry", source = "refreshTokenExpiry", qualifiedByName = "ldtToUtcStr")
   SessionDto mapToDto(Session entity);
 
-  @Mappings(value = {
-      @Mapping(target = "dateCreated", ignore = true),
-      @Mapping(target = "dateUpdated", ignore = true),
-      @Mapping(target = "id", ignore = true)
-  })
+  @Mapping(target = "dateCreated", ignore = true)
+  @Mapping(target = "dateUpdated", ignore = true)
+  @Mapping(target = "id", ignore = true)
   Session mapToEntity(SessionDto dto);
 
   /**

@@ -22,11 +22,17 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @RegisterForReflection
+@ToString(callSuper = true)
 public class WebhookLoginDto extends LoginDto {
+
+  private String botSource;
+
   private String mobile;
+
 }

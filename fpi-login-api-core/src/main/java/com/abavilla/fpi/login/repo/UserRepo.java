@@ -28,7 +28,13 @@ import io.smallrye.mutiny.Uni;
 
 @ApplicationScoped
 public class UserRepo extends AbsMongoRepo<User> {
+
   public Uni<Optional<User>> findByMetaId(String metaId) {
     return find("{'metaId': ?1}", metaId).singleResultOptional();
   }
+
+  public Uni<Optional<User>> findByTelegramId(String tgId) {
+    return find("{'telegramId': ?1}", tgId).singleResultOptional();
+  }
+
 }
