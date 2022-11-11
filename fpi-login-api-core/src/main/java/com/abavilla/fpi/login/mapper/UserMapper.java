@@ -20,11 +20,11 @@
 
 package com.abavilla.fpi.login.mapper;
 
-import com.abavilla.fpi.bot.ext.entity.enums.BotSource;
 import com.abavilla.fpi.fw.mapper.IDtoToEntityMapper;
 import com.abavilla.fpi.login.entity.User;
 import com.abavilla.fpi.login.ext.dto.UserDto;
 import com.abavilla.fpi.login.ext.dto.WebhookLoginDto;
+import com.abavilla.fpi.telco.ext.enums.BotSource;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Condition;
 import org.mapstruct.InjectionStrategy;
