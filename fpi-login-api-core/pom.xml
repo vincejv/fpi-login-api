@@ -75,7 +75,7 @@
 
     <dependency>
       <groupId>com.abavilla</groupId>
-      <artifactId>fpi-bot-api-lib</artifactId>
+      <artifactId>fpi-telco-plugin-lib</artifactId>
     </dependency>
 
   </dependencies>

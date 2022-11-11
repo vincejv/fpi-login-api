@@ -26,7 +26,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 
-import com.abavilla.fpi.bot.ext.entity.enums.BotSource;
 import com.abavilla.fpi.fw.exceptions.FPISvcEx;
 import com.abavilla.fpi.fw.service.AbsRepoSvc;
 import com.abavilla.fpi.fw.util.DateUtil;
@@ -41,6 +40,7 @@ import com.abavilla.fpi.login.mapper.UserMapper;
 import com.abavilla.fpi.login.repo.SessionRepo;
 import com.abavilla.fpi.login.repo.UserRepo;
 import com.abavilla.fpi.login.util.LoginUtil;
+import com.abavilla.fpi.telco.ext.enums.BotSource;
 import com.mongodb.ErrorCategory;
 import com.mongodb.MongoWriteException;
 import io.smallrye.mutiny.Uni;
