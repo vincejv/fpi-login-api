@@ -20,15 +20,20 @@
 
 package com.abavilla.fpi.login.ext.rest;
 
+import java.time.temporal.ChronoUnit;
+
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import com.abavilla.fpi.fw.dto.impl.RespDto;
+import com.abavilla.fpi.fw.exceptions.AuthApiSvcEx;
 import com.abavilla.fpi.fw.exceptions.handler.ApiRepoExHandler;
 import com.abavilla.fpi.fw.rest.IApi;
 import com.abavilla.fpi.login.ext.dto.SessionDto;
 import com.abavilla.fpi.login.ext.dto.WebhookLoginDto;
+import io.smallrye.faulttolerance.api.ExponentialBackoff;
 import io.smallrye.mutiny.Uni;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -36,6 +41,9 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @RegisterRestClient(configKey = "login-api")
 @RegisterClientHeaders(AppToAppPreAuth.class)
 @RegisterProvider(value = ApiRepoExHandler.class)
+@Retry(maxRetries = 8, retryOn = AuthApiSvcEx.class, delay = 3,
+  delayUnit = ChronoUnit.SECONDS, jitter = 1500L)
+@ExponentialBackoff(maxDelay = 25, maxDelayUnit = ChronoUnit.SECONDS)
 public interface TrustedLoginApi extends IApi {
 
   /**

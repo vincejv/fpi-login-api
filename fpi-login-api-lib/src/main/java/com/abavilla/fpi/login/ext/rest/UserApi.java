@@ -20,14 +20,19 @@
 
 package com.abavilla.fpi.login.ext.rest;
 
+import java.time.temporal.ChronoUnit;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.QueryParam;
 
 import com.abavilla.fpi.fw.dto.impl.RespDto;
+import com.abavilla.fpi.fw.exceptions.AuthApiSvcEx;
 import com.abavilla.fpi.fw.exceptions.handler.ApiRepoExHandler;
 import com.abavilla.fpi.fw.rest.IApi;
 import com.abavilla.fpi.login.ext.dto.UserDto;
+import io.smallrye.faulttolerance.api.ExponentialBackoff;
 import io.smallrye.mutiny.Uni;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -35,6 +40,9 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @RegisterRestClient(configKey = "user-api")
 @RegisterClientHeaders(AppToAppPreAuth.class)
 @RegisterProvider(value = ApiRepoExHandler.class)
+@Retry(maxRetries = 8, retryOn = AuthApiSvcEx.class, delay = 3,
+  delayUnit = ChronoUnit.SECONDS, jitter = 1500L)
+@ExponentialBackoff(maxDelay = 25, maxDelayUnit = ChronoUnit.SECONDS)
 public interface UserApi extends IApi {
 
   /**
