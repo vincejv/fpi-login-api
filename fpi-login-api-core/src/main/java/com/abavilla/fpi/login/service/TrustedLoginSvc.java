@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.core.Response;
 
 import com.abavilla.fpi.fw.exceptions.FPISvcEx;
 import com.abavilla.fpi.fw.service.AbsRepoSvc;
@@ -115,7 +114,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
           );
         } else {
           throw new FPISvcEx("User not yet verified yet",
-              Response.Status.FORBIDDEN.getStatusCode());
+              RestResponse.StatusCode.NOT_ACCEPTABLE);
         }
       }
     })
