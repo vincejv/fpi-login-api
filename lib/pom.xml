@@ -41,18 +41,18 @@
     <tag>HEAD</tag>
   </scm>
 
-  <name>FPI Login API core module</name>
+  <name>FPI Login API shared library</name>
   <description>Reactive backend REST login authentication API for FPI System</description>
   <url>https://github.com/vincejv/fpi-login-api</url>
   <inceptionYear>2022</inceptionYear>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>fpi-login-api-core</artifactId>
+  <artifactId>fpi-login-api</artifactId>
   <version>0</version>
 
   <parent>
     <groupId>com.abavilla</groupId>
-    <artifactId>fpi-login-api</artifactId>
+    <artifactId>fpi-login-api-parent</artifactId>
     <version>0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
@@ -64,18 +64,8 @@
   <dependencies>
 
     <dependency>
-      <groupId>com.abavilla</groupId>
-      <artifactId>fpi-login-api-lib</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>at.favre.lib</groupId>
       <artifactId>bcrypt</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.abavilla</groupId>
-      <artifactId>fpi-telco-plugin-lib</artifactId>
     </dependency>
 
   </dependencies>
@@ -83,11 +73,7 @@
     <plugins>
 
       <plugin>
-        <groupId>${quarkus.platform.group-id}</groupId>
-        <artifactId>quarkus-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
 
@@ -97,10 +83,12 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
 

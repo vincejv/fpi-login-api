@@ -47,19 +47,19 @@
   <inceptionYear>2022</inceptionYear>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>fpi-login-api</artifactId>
+  <artifactId>fpi-login-api-parent</artifactId>
   <version>0</version>
   <packaging>pom</packaging>
 
   <parent>
     <groupId>com.abavilla</groupId>
     <artifactId>fpi-framework-pom</artifactId>
-    <version>1.5.2</version>
+    <version>1.5.4</version>
   </parent>
 
   <modules>
-    <module>fpi-login-api-lib</module>
-    <module>fpi-login-api-core</module>
+    <module>lib</module>
+    <module>core</module>
   </modules>
 
   <properties>
@@ -71,7 +71,7 @@
 
       <dependency>
         <groupId>com.abavilla</groupId>
-        <artifactId>fpi-login-api-lib</artifactId>
+        <artifactId>fpi-login-api</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -83,8 +83,8 @@
 
       <dependency>
         <groupId>com.abavilla</groupId>
-        <artifactId>fpi-telco-plugin-lib</artifactId>
-        <version>1.2.0</version>
+        <artifactId>fpi-telco-plugin</artifactId>
+        <version>1.2.2</version>
       </dependency>
 
     </dependencies>
