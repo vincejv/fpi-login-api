@@ -37,4 +37,8 @@ public class UserRepo extends AbsMongoRepo<User> {
     return find("{'telegramId': ?1}", tgId).singleResultOptional();
   }
 
+  public Uni<Optional<User>> findByViberId(String viberId) {
+    return find("{'viberId': ?1}", viberId).singleResultOptional();
+  }
+
 }

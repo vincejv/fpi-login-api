@@ -77,15 +77,15 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
   AuthzClient authzClient;
 
   public Uni<SessionDto> authorizedLogin(WebhookLoginDto loginDto) {
-    Uni<Optional<User>> byMetaId;
+    Uni<Optional<User>> bySocialId;
 
-    if (BotSource.TELEGRAM == BotSource.fromValue(loginDto.getBotSource())) {
-      byMetaId = repo.findByTelegramId(loginDto.getUsername());
-    } else {
-      byMetaId = repo.findByMetaId(loginDto.getUsername());
+    switch (BotSource.fromValue(loginDto.getBotSource())) {
+      case TELEGRAM -> bySocialId = repo.findByTelegramId(loginDto.getUsername());
+      case VIBER -> bySocialId = repo.findByViberId(loginDto.getUsername());
+      default -> bySocialId = repo.findByMetaId(loginDto.getUsername());
     }
 
-    return byMetaId.chain(authorizedUser -> {
+    return bySocialId.chain(authorizedUser -> {
       if (authorizedUser.isEmpty()) {
         // register
         var user = new User();
