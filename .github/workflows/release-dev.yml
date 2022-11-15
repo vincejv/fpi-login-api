@@ -203,7 +203,7 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-        run: mvn -B deploy -Prelease-for-oss,allow-snapshots
+        run: mvn -B deploy -Dlib-only -Prelease-for-oss,allow-snapshots
 
   pr_update:
     name: Pull request update
