@@ -90,7 +90,6 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
         // register
         var user = new User();
         userMapper.mapLoginToUser(user, loginDto);
-        user.setMobile(loginDto.getMobile());
         user.setStatus(UserStatus.PENDING);
         user.setDateCreated(DateUtil.now());
         user.setDateUpdated(DateUtil.now());
