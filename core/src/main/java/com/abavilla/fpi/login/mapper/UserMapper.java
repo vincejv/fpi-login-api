@@ -49,6 +49,7 @@ public interface UserMapper extends IDtoToEntityMapper<UserDto, User> {
   @Mapping(target = "metaId", source = "username",  conditionQualifiedByName = "isMetaId")
   @Mapping(target = "telegramId", source = "username",  conditionQualifiedByName = "isTelegramId")
   @Mapping(target = "viberId", source = "username",  conditionQualifiedByName = "isViberId")
+  @Mapping(target = "mobile", source = "username", conditionQualifiedByName = "isMobileNo")
   void mapLoginToUser(@MappingTarget User user, WebhookLoginDto login);
 
   @Named("isMetaId")
@@ -67,6 +68,12 @@ public interface UserMapper extends IDtoToEntityMapper<UserDto, User> {
   @Condition
   default boolean isViberId(WebhookLoginDto login) {
     return BotSource.fromValue(login.getBotSource()) == BotSource.VIBER;
+  }
+
+  @Named("isMobileNo")
+  @Condition
+  default boolean isMobileNo(WebhookLoginDto login) {
+    return BotSource.fromValue(login.getBotSource()) == BotSource.SMS;
   }
 
 }
