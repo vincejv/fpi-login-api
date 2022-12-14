@@ -81,6 +81,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
     switch (BotSource.fromValue(loginDto.getBotSource())) {
       case TELEGRAM -> bySocialId = repo.findByTelegramId(loginDto.getUsername());
       case VIBER -> bySocialId = repo.findByViberId(loginDto.getUsername());
+      case SMS -> bySocialId = repo.findByMobileNo(loginDto.getUsername());
       default -> bySocialId = repo.findByMetaId(loginDto.getUsername());
     }
 

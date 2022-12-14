@@ -41,4 +41,8 @@ public class UserRepo extends AbsMongoRepo<User> {
     return find("{'viberId': ?1}", viberId).singleResultOptional();
   }
 
+  public Uni<Optional<User>> findByMobileNo(String mobile) {
+    return find("{'mobile': ?1}", mobile).singleResultOptional();
+  }
+
 }
