@@ -39,4 +39,10 @@ public class LoginDto extends AbsDto {
    * Username for login
    */
   private String username;
+
+  /**
+   * Friendly name of user for interface display
+   */
+  private String friendlyName;
+
 }

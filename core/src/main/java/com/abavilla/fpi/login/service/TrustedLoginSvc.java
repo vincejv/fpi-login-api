@@ -117,7 +117,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
                 mapSessionEntityToDto(sessionMapper.mapToDto(savedSession), loginDto, SessionDto.SessionStatus.ESTABLISHED))
           );
         } else {
-          throw new FPISvcEx(String.format("User Id %s is not verified", loginDto.getUsername()),
+          throw new FPISvcEx(String.format("Hi %s, your account is currently under manual verification, we will send an update once your account is ready", loginDto.getFriendlyName()),
               RestResponse.StatusCode.NOT_ACCEPTABLE);
         }
       }
@@ -132,11 +132,11 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
     sessionDto.setStatus(sessionStatus);
     switch (sessionStatus) {
       case CREATED_USER ->
-        sessionDto.setMessage(String.format("Hi %s! Your FPI account has been created, please wait while we verify your membership", user.getUsername()));
+        sessionDto.setMessage(String.format("Hi %s! Your FPI account has been created, please wait while we verify your membership", user.getFriendlyName()));
       case ESTABLISHED ->
-        sessionDto.setMessage(String.format("Hi %s, we are ready to serve your request", user.getUsername()));
+        sessionDto.setMessage(String.format("Hi %s, we are ready to serve your request", user.getFriendlyName()));
       case PENDING_VERIFICATION ->
-        sessionDto.setMessage(String.format("Hi %s, your account is currently being verified by our support team. We will notify you once we have verified your membership", user.getUsername()));
+        sessionDto.setMessage(String.format("Hi %s, your account is currently being verified by our support team. We will notify you once we have verified your membership", user.getFriendlyName()));
       default ->
         sessionDto.setMessage("We have an issue accessing your account, please contact FPI Customer care at +639189177933 for assistance");
     }
