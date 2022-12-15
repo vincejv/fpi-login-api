@@ -100,7 +100,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
         user.setRegistrationDate(DateUtil.now());
         user.setLastAccess(DateUtil.now());
         return repo.persist(user).replaceWith(() ->
-          mapSessionEntityToDto(new SessionDto(), SessionDto.SessionStatus.CREATED_USER));
+          mapSessionEntityToDto(new SessionDto(), loginDto, SessionDto.SessionStatus.CREATED_USER));
       } else {
         // get registered user
         User user = authorizedUser.get();
@@ -114,7 +114,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
               .onFailure(IOException.class).retry().withBackOff( // retry keycloak exceptions
                 Duration.ofSeconds(3)).withJitter(0.2).atMost(5)
               .map(savedSession ->
-                mapSessionEntityToDto(sessionMapper.mapToDto(savedSession), SessionDto.SessionStatus.ESTABLISHED))
+                mapSessionEntityToDto(sessionMapper.mapToDto(savedSession), loginDto, SessionDto.SessionStatus.ESTABLISHED))
           );
         } else {
           throw new FPISvcEx(String.format("User Id %s is not verified", loginDto.getUsername()),
@@ -128,9 +128,19 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
       Duration.ofSeconds(3)).withJitter(0.2).indefinitely();
   }
 
-  private SessionDto mapSessionEntityToDto(SessionDto mapper, SessionDto.SessionStatus established) {
-    mapper.setStatus(established);
-    return mapper;
+  private SessionDto mapSessionEntityToDto(SessionDto sessionDto, LoginDto user, SessionDto.SessionStatus sessionStatus) {
+    sessionDto.setStatus(sessionStatus);
+    switch (sessionStatus) {
+      case CREATED_USER ->
+        sessionDto.setMessage(String.format("Hi %s! Your FPI account has been created, please wait while we verify your membership", user.getUsername()));
+      case ESTABLISHED ->
+        sessionDto.setMessage(String.format("Hi %s, we are ready to serve your request", user.getUsername()));
+      case PENDING_VERIFICATION ->
+        sessionDto.setMessage(String.format("Hi %s, your account is currently being verified by our support team. We will notify you once we have verified your membership", user.getUsername()));
+      default ->
+        sessionDto.setMessage("We have an issue accessing your account, please contact FPI Customer care at +639189177933 for assistance");
+    }
+    return sessionDto;
   }
 
   private Uni<Session> createSession(User user, Session session, boolean foundExistingSession) {

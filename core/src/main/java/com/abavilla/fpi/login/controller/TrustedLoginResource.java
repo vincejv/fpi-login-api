@@ -55,7 +55,7 @@ public class TrustedLoginResource extends AbsBaseResource<LoginDto, User, Truste
     RespDto<SessionDto> resp = new RespDto<>();
     resp.setTimestamp(DateUtil.nowAsStr());
     return service.authorizedLogin(loginDto).map(sessionDto -> {
-      resp.setStatus(String.valueOf(sessionDto.getStatus()));
+      resp.setStatus(sessionDto.getMessage());
       resp.setResp(sessionDto);
       return RestResponse.ok(resp);
     });
