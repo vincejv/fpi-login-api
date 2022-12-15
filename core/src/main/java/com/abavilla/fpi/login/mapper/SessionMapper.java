@@ -43,11 +43,13 @@ public interface SessionMapper extends IDtoToEntityMapper<SessionDto, Session> {
   @Mapping(target = "dateUpdated", ignore = true)
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "tokenExpiry", source = "refreshTokenExpiry", qualifiedByName = "ldtToUtcStr")
+  @Mapping(target = "roles", source = "keycloakRoles")
   SessionDto mapToDto(Session entity);
 
   @Mapping(target = "dateCreated", ignore = true)
   @Mapping(target = "dateUpdated", ignore = true)
   @Mapping(target = "id", ignore = true)
+  @Mapping(target = "keycloakRoles", ignore = true)
   Session mapToEntity(SessionDto dto);
 
   /**

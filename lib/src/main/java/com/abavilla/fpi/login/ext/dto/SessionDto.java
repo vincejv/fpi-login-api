@@ -22,6 +22,7 @@ import static com.abavilla.fpi.fw.util.FWConst.UNKNOWN_PREFIX;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.abavilla.fpi.fw.dto.AbsDto;
@@ -126,4 +127,10 @@ public class SessionDto extends AbsDto {
    * Date and time when token will expire in UTC time
    */
   private String tokenExpiry;
+
+  /**
+   * Roles associated with the user provisioned in keycloak server
+   */
+  private List<String> roles;
+
 }

@@ -20,6 +20,7 @@ package com.abavilla.fpi.login.service;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -43,9 +44,12 @@ import com.abavilla.fpi.telco.ext.enums.BotSource;
 import com.mongodb.ErrorCategory;
 import com.mongodb.MongoWriteException;
 import io.smallrye.mutiny.Uni;
+import lombok.SneakyThrows;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.keycloak.TokenVerifier;
 import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
 
 @ApplicationScoped
@@ -113,7 +117,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
                 mapSessionEntityToDto(sessionMapper.mapToDto(savedSession), SessionDto.SessionStatus.ESTABLISHED))
           );
         } else {
-          throw new FPISvcEx("User not yet verified yet",
+          throw new FPISvcEx(String.format("User Id %s is not verified", loginDto.getUsername()),
               RestResponse.StatusCode.NOT_ACCEPTABLE);
         }
       }
@@ -153,7 +157,10 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
    * @param session Session to map
    * @param auth Authentication response
    */
+  @SneakyThrows
   private void mapLoginToSession(User user, Session session, AccessTokenResponse auth) {
+    var verifier = TokenVerifier.create(auth.getToken(), AccessToken.class);
+    var kcRoles = verifier.getToken().getRealmAccess().getRoles();
     session.setUsername(user.getId().toHexString());
     session.setPassword(LoginUtil.hashPassword(
         trustedKey.toCharArray()));
@@ -162,6 +169,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
     session.setDateCreated(DateUtil.now());
     session.setRefreshTokenExpiry(DateUtil.now()
         .plusSeconds(auth.getExpiresIn() - tokenGracePeriod));
+    session.setKeycloakRoles(new ArrayList<>(kcRoles));
   }
 
 }

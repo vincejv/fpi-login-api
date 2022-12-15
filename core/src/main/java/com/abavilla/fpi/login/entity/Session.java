@@ -19,6 +19,7 @@
 package com.abavilla.fpi.login.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.abavilla.fpi.fw.entity.mongo.AbsMongoItem;
 import io.quarkus.mongodb.panache.common.MongoEntity;
@@ -73,4 +74,10 @@ public class Session extends AbsMongoItem {
    * Browser User-agent of client who established the session
    */
   private String userAgent;
+
+  /**
+   * Roles associated with the user provisioned in keycloak server
+   */
+  private List<String> keycloakRoles;
+
 }
