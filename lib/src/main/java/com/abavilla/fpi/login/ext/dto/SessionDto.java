@@ -52,8 +52,23 @@ public class SessionDto extends AbsDto {
   @AllArgsConstructor
   public enum SessionStatus implements IBaseEnum {
     CREATED_USER(1, "Created user"),
+
     ESTABLISHED(2, "Session established"),
+
     PENDING_VERIFICATION(3, "Pending user verification"),
+
+    BLOCKED_UNS(4, "Account blocked for unspecified reason"),
+
+    BLOCKED_LEGAL(5, "Account has been blocked due to legal concerns"),
+
+    BLOCKED_SUSPECT(6, "Account has been blocked due to suspicious activity"),
+
+    DEACTIVATED(7, "Account has been deactivated as per user request"),
+
+    INACTIVE(8, "Account has been inactive for a while thus it is deactivated"),
+
+    PRIV_CLEAN(9, "Account has been requested to be removed from the system for privacy concerns"),
+
     UNKNOWN(-1, UNKNOWN_PREFIX);
 
     /**
@@ -120,8 +135,13 @@ public class SessionDto extends AbsDto {
   /**
    * Current status of the session
    */
-  @JsonIgnore
   private SessionStatus status;
+
+  /**
+   * Current status of the session to be displayed to the user
+   */
+  @JsonIgnore /* Ignored as the parent should hold the message */
+  private String message;
 
   /**
    * Date and time when token will expire in UTC time
