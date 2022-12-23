@@ -55,6 +55,15 @@ public interface UserApi extends IApi {
   Uni<RespDto<UserDto>> getByMetaId(@QueryParam("metaId") String metaId);
 
   /**
+   * Retrieves {@link UserDto} given the user's {@code mobileNo}.
+   *
+   * @param mobile the mobile number
+   * @return {@link UserDto}
+   */
+  @GET
+  Uni<RespDto<UserDto>> getByMobile(@QueryParam("mobile") String mobile);
+
+  /**
    * Retrieves {@link UserDto} given the user's {@code id}.
    *
    * @param userId the user id

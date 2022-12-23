@@ -74,4 +74,14 @@ public class UserSvc extends AbsRepoSvc<UserDto, User, UserRepo> {
         RestResponse.StatusCode.NOT_FOUND);
     });
   }
+
+  public Uni<UserDto> getByMobile(String mobileNo) {
+    return repo.findByMobileNo(mobileNo).chain(user -> {
+      if (user.isPresent()) {
+        return Uni.createFrom().item(this.mapToDto(user.get()));
+      }
+      throw new FPISvcEx(String.format("User with mobile number %s was not found", mobileNo),
+        RestResponse.StatusCode.NOT_FOUND);
+    });
+  }
 }
