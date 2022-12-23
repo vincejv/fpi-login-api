@@ -79,4 +79,9 @@ public class User extends AbsMongoItem {
    */
   private LocalDateTime lastAccess;
 
+  /**
+   * Name associated with the user
+   */
+  private PersonName name;
+
 }

@@ -56,12 +56,15 @@ public class UserResource extends AbsBaseResource<UserDto, User, UserSvc> {
    */
   @GET
   public Uni<RespDto<UserDto>> getById(@QueryParam("metaId") String metaId,
-                                           @QueryParam("id") String userId) {
+                                       @QueryParam("id") String userId,
+                                       @QueryParam("mobile") String mobile) {
     Uni<UserDto> userLookup;
     if (StringUtils.isNotBlank(metaId)) {
       userLookup = service.getByMetaId(metaId);
-    } else {
+    } else if (StringUtils.isNotBlank(userId)) {
       userLookup = service.get(userId);
+    } else {
+      userLookup = service.getByMobile(mobile);
     }
     return userLookup.map(user -> {
       RespDto<UserDto> resp = new RespDto<>();
