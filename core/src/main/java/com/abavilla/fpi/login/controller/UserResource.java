@@ -20,10 +20,6 @@
 
 package com.abavilla.fpi.login.controller;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-
 import com.abavilla.fpi.fw.controller.AbsBaseResource;
 import com.abavilla.fpi.fw.dto.IDto;
 import com.abavilla.fpi.fw.dto.impl.RespDto;
@@ -33,6 +29,9 @@ import com.abavilla.fpi.login.entity.User;
 import com.abavilla.fpi.login.ext.dto.UserDto;
 import com.abavilla.fpi.login.service.UserSvc;
 import io.smallrye.mutiny.Uni;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;

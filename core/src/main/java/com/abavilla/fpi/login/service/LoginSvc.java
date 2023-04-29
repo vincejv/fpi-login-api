@@ -22,10 +22,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.ws.rs.NotAuthorizedException;
-
 import com.abavilla.fpi.fw.service.AbsRepoSvc;
 import com.abavilla.fpi.fw.util.DateUtil;
 import com.abavilla.fpi.login.entity.Session;
@@ -39,6 +35,9 @@ import com.abavilla.fpi.login.util.LoginUtil;
 import com.mongodb.ErrorCategory;
 import com.mongodb.MongoWriteException;
 import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.NotAuthorizedException;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.util.HttpResponseException;
