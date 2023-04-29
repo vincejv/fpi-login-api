@@ -20,11 +20,10 @@ package com.abavilla.fpi.login.repo;
 
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
-
 import com.abavilla.fpi.fw.repo.AbsMongoRepo;
 import com.abavilla.fpi.login.entity.Session;
 import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * Repository layer for managing the session table in DB.
