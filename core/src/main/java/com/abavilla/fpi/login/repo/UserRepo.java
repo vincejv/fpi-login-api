@@ -20,11 +20,10 @@ package com.abavilla.fpi.login.repo;
 
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
-
 import com.abavilla.fpi.fw.repo.AbsMongoRepo;
 import com.abavilla.fpi.login.entity.User;
 import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class UserRepo extends AbsMongoRepo<User> {

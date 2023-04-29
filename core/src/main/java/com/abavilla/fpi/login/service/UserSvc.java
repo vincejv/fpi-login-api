@@ -20,9 +20,6 @@
 
 package com.abavilla.fpi.login.service;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import com.abavilla.fpi.fw.exceptions.FPISvcEx;
 import com.abavilla.fpi.fw.service.AbsRepoSvc;
 import com.abavilla.fpi.login.entity.User;
@@ -30,6 +27,8 @@ import com.abavilla.fpi.login.ext.dto.UserDto;
 import com.abavilla.fpi.login.mapper.UserMapper;
 import com.abavilla.fpi.login.repo.UserRepo;
 import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.jboss.resteasy.reactive.RestResponse;
 
 /**

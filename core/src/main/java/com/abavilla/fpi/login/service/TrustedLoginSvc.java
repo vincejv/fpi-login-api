@@ -23,9 +23,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import com.abavilla.fpi.fw.exceptions.FPISvcEx;
 import com.abavilla.fpi.fw.service.AbsRepoSvc;
 import com.abavilla.fpi.fw.util.DateUtil;
@@ -44,6 +41,8 @@ import com.abavilla.fpi.telco.ext.enums.BotSource;
 import com.mongodb.ErrorCategory;
 import com.mongodb.MongoWriteException;
 import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import lombok.SneakyThrows;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.resteasy.reactive.RestResponse;
