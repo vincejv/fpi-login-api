@@ -18,34 +18,12 @@
 
 package com.abavilla.fpi.login.codec;
 
-import com.abavilla.fpi.fw.codec.IEnumCodecProvider;
-import com.abavilla.fpi.login.entity.UserStatus;
-import org.bson.codecs.Codec;
+import com.abavilla.fpi.fw.codec.AbsEnumCodec;
+import com.abavilla.fpi.login.ext.entity.ServiceStatus;
 
-/**
- * MongoDB Codec registry, contains all the codec for classes that doesn't
- * work by default with default POJO codec for MongoDb driver.
- *
- * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
- */
-public class EnumCodecProvider implements IEnumCodecProvider {
-  /**
-   * Provides the codec mapping definition
-   *
-   * @param clazz Class to decode/encode
-   * @return {@link Codec} to use
-   * @param <T> Type of {@link Codec}
-   */
+public class ServiceStatusCodec extends AbsEnumCodec<ServiceStatus> {
   @Override
-  @SuppressWarnings("unchecked")
-  public <T> Codec<T> getCodecProvider(Class<T> clazz) {
-    if (clazz == char[].class) {
-      return (Codec<T>) new CharArrayCodec();
-    } else if (clazz == UserStatus.class) {
-      return (Codec<T>) new UserStatusCodec();
-    } else if (clazz == ServiceStatusCodec.class) {
-      return (Codec<T>) new ServiceStatusCodec();
-    }
-    return null; // Don't throw here, this tells Mongo this provider doesn't provide a decoder for the requested clazz
+  public Class<ServiceStatus> getEncoderClass() {
+    return ServiceStatus.class;
   }
 }
