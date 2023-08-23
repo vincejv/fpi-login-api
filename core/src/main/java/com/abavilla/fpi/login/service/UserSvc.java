@@ -83,4 +83,12 @@ public class UserSvc extends AbsRepoSvc<UserDto, User, UserRepo> {
         RestResponse.StatusCode.NOT_FOUND);
     });
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void patchEntityFromDto(User entity, UserDto dto) {
+    userMapper.patchEntity(entity, dto);
+  }
 }
