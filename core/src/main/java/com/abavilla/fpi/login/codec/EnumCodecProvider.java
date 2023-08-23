@@ -20,6 +20,7 @@ package com.abavilla.fpi.login.codec;
 
 import com.abavilla.fpi.fw.codec.IEnumCodecProvider;
 import com.abavilla.fpi.login.entity.UserStatus;
+import com.abavilla.fpi.login.ext.entity.ServiceStatus;
 import org.bson.codecs.Codec;
 
 /**
@@ -43,7 +44,7 @@ public class EnumCodecProvider implements IEnumCodecProvider {
       return (Codec<T>) new CharArrayCodec();
     } else if (clazz == UserStatus.class) {
       return (Codec<T>) new UserStatusCodec();
-    } else if (clazz == ServiceStatusCodec.class) {
+    } else if (clazz == ServiceStatus.class) {
       return (Codec<T>) new ServiceStatusCodec();
     }
     return null; // Don't throw here, this tells Mongo this provider doesn't provide a decoder for the requested clazz
