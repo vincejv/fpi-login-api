@@ -21,6 +21,7 @@ package com.abavilla.fpi.login.entity;
 import java.time.LocalDateTime;
 
 import com.abavilla.fpi.fw.entity.mongo.AbsMongoItem;
+import com.abavilla.fpi.login.ext.entity.ServiceStatus;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -83,5 +84,10 @@ public class User extends AbsMongoItem {
    * Name associated with the user
    */
   private PersonName name;
+
+  /**
+   * Fields indicating if the user has opted in or opted out of the service
+   */
+  private ServiceStatus svcStatus;
 
 }

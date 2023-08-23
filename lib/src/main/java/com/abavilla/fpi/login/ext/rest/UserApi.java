@@ -30,6 +30,7 @@ import com.abavilla.fpi.login.ext.dto.UserDto;
 import io.smallrye.faulttolerance.api.ExponentialBackoff;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.QueryParam;
 import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
@@ -70,5 +71,14 @@ public interface UserApi extends IApi {
    */
   @GET
   Uni<RespDto<UserDto>> getById(@QueryParam("id") String userId);
+
+  /**
+   * Patches {@link UserDto} given the user's {@code id}.
+   *
+   * @param userId the user id
+   * @return {@link UserDto}
+   */
+  @PATCH
+  Uni<RespDto<UserDto>> patchById(@QueryParam("id") String userId, UserDto patch);
 
 }
