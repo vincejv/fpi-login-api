@@ -21,6 +21,7 @@
 package com.abavilla.fpi.login.ext.dto;
 
 import com.abavilla.fpi.fw.dto.AbsDto;
+import com.abavilla.fpi.login.ext.entity.ServiceStatus;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -56,5 +57,10 @@ public class UserDto extends AbsDto {
    * Mobile number
    */
   private String mobile;
+
+  /**
+   * Flag for indicating if user has opted-in or out of the service
+   */
+  private ServiceStatus svcStatus;
 
 }

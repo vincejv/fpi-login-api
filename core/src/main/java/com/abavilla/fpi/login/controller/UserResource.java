@@ -20,7 +20,7 @@
 
 package com.abavilla.fpi.login.controller;
 
-import com.abavilla.fpi.fw.controller.AbsBaseResource;
+import com.abavilla.fpi.fw.controller.AbsResource;
 import com.abavilla.fpi.fw.dto.IDto;
 import com.abavilla.fpi.fw.dto.impl.RespDto;
 import com.abavilla.fpi.fw.exceptions.FPISvcEx;
@@ -29,6 +29,7 @@ import com.abavilla.fpi.login.entity.User;
 import com.abavilla.fpi.login.ext.dto.UserDto;
 import com.abavilla.fpi.login.service.UserSvc;
 import io.smallrye.mutiny.Uni;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
@@ -43,7 +44,7 @@ import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
  * @author <a href="mailto:vincevillamora@gmail.com">Vince Villamora</a>
  */
 @Path("/fpi/user")
-public class UserResource extends AbsBaseResource<UserDto, User, UserSvc> {
+public class UserResource extends AbsResource<UserDto, User, UserSvc> {
 
   /**
    * Retrieves {@link UserDto} given the user's {@code metaId} or {@code userId}, if multiple id's are given,
@@ -72,6 +73,21 @@ public class UserResource extends AbsBaseResource<UserDto, User, UserSvc> {
       resp.setStatus(RestResponse.Status.FOUND.getReasonPhrase());
       return resp;
     });
+  }
+
+  @Override
+  public Uni<UserDto> updateItem(String id, UserDto body) {
+    throw new ForbiddenException();
+  }
+
+  @Override
+  public Uni<UserDto> saveItem(UserDto body) {
+    throw new ForbiddenException();
+  }
+
+  @Override
+  public Uni<UserDto> deleteItem(String id) {
+    throw new ForbiddenException();
   }
 
   /**

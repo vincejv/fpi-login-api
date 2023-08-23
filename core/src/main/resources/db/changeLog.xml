@@ -3,6 +3,7 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
         http://www.liquibase.org/xml/ns/dbchangelog-ext https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
@@ -29,6 +30,25 @@
       <ext:options>{unique: true, name: "mobile", partialFilterExpression: { mobile: { $exists: true } }}</ext:options>
     </ext:createIndex>
 
+  </changeSet>
+
+  <changeSet id="3" author="vincejv" labels="login_api" context="main">
+    <comment>add service status column and opt-in all users by default</comment>
+    <mongodb:runCommand>
+      <mongodb:command>
+        {
+          update: "system_users",
+          updates: [
+            {
+              q: {},
+              u: { $set: { 'svcStatus': {'value': 'Opt-in', 'ord' : NumberInt(1) } } },
+              upsert: false,
+              multi: true,
+            },
+          ],
+        }
+      </mongodb:command>
+    </mongodb:runCommand>
   </changeSet>
 
 </databaseChangeLog>
