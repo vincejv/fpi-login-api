@@ -106,6 +106,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
         user.setLastAccess(DateUtil.now());
         user.setDateUpdated(DateUtil.now());
         if (user.getStatus() == UserStatus.VERIFIED) {
+          // create a true session when it is mapped to keycloak (VERIFIED)
           return repo.update(user).chain(() ->
             sessionRepo
               .findByUsername(user.getId().toHexString()).chain(sessionOpt ->
@@ -116,8 +117,10 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
                 mapSessionEntityToDto(sessionMapper.mapToDto(savedSession), loginDto, SessionDto.SessionStatus.ESTABLISHED))
           );
         } else {
-          throw new FPISvcEx(String.format("Hi %s, your account is currently under manual verification, we will send an update once your account is ready", loginDto.getFriendlyName()),
-              RestResponse.StatusCode.NOT_ACCEPTABLE);
+          // empty session as no keycloak mapping yet
+          var emptySession = new SessionDto();
+          mapSessionEntityToDto(emptySession, loginDto, SessionDto.SessionStatus.PENDING_VERIFICATION);
+          return Uni.createFrom().item(emptySession);
         }
       }
     })
