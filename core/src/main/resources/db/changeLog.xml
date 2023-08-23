@@ -22,4 +22,13 @@
 
   </changeSet>
 
+  <changeSet id="2" author="vincejv" labels="login_api" context="main">
+    <comment>unique mobile number</comment>
+    <ext:createIndex collectionName="system_users">
+      <ext:keys>{mobile: 1}</ext:keys>
+      <ext:options>{unique: true, name: "mobile", partialFilterExpression: { mobile: { $exists: true } }}</ext:options>
+    </ext:createIndex>
+
+  </changeSet>
+
 </databaseChangeLog>
