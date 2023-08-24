@@ -154,15 +154,17 @@ jobs:
           region: ${{ env.REGION }}
           image: ${{ steps.image_version.outputs.service_image_path }}
           project_id: ${{ env.PROJECT_ID }}
-          flags: --cpu ${{ env.SERVICE_CPU }} --memory ${{ env.SERVICE_MEMORY }} --timeout 900 --no-cpu-throttling
-          env_vars: |
-            OIDC_CLIENT_ID=${{ secrets.OIDC_CLIENT_ID }}
-            OIDC_AUTH_URL=${{ secrets.OIDC_AUTH_URL }}
-            DB_NAME=login-api-dev
-          secrets: |
-            MONGO_CONN_STRING=vbl_mongo_connection_string:latest
-            OIDC_SECRET=oidc_secret_keycloak:latest
-            FPI_APP_TO_APP_TRUSTED_KEY=fpi_app_to_app_trusted_key:latest
+          flags: |
+            --set-env-vars ^##^MONGO_CONN_STRING=${{ secrets.MONGO_CONN_STRING }}
+            --set-env-vars OIDC_CLIENT_ID=${{ secrets.OIDC_CLIENT_ID }}
+            --set-env-vars OIDC_AUTH_URL=${{ secrets.OIDC_AUTH_URL }}
+            --set-env-vars OIDC_SECRET=${{ secrets.OIDC_SECRET }}
+            --set-env-vars FPI_APP_TO_APP_TRUSTED_KEY=${{ secrets.FPI_APP_TO_APP_TRUSTED_KEY }}
+            --set-env-vars DB_NAME=login-api-dev
+            --cpu ${{ env.SERVICE_CPU }}
+            --memory ${{ env.SERVICE_MEMORY }}
+            --timeout 900
+            --no-cpu-throttling
           labels: |
             env=${{ env.SERVICE_ENV }}
 
