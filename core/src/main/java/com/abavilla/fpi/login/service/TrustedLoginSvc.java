@@ -32,6 +32,7 @@ import com.abavilla.fpi.login.entity.UserStatus;
 import com.abavilla.fpi.login.ext.dto.LoginDto;
 import com.abavilla.fpi.login.ext.dto.SessionDto;
 import com.abavilla.fpi.login.ext.dto.WebhookLoginDto;
+import com.abavilla.fpi.login.ext.entity.ServiceStatus;
 import com.abavilla.fpi.login.mapper.SessionMapper;
 import com.abavilla.fpi.login.mapper.UserMapper;
 import com.abavilla.fpi.login.repo.SessionRepo;
@@ -94,6 +95,7 @@ public class TrustedLoginSvc extends AbsRepoSvc<LoginDto, User, UserRepo> {
         var user = new User();
         userMapper.mapLoginToUser(user, loginDto);
         user.setStatus(UserStatus.PENDING);
+        user.setSvcStatus(ServiceStatus.OPT_OUT);
         user.setDateCreated(DateUtil.now());
         user.setDateUpdated(DateUtil.now());
         user.setRegistrationDate(DateUtil.now());
