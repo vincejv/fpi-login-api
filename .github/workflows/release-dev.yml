@@ -64,16 +64,11 @@ jobs:
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }} -Dsonar.qualitygate.wait=true -P allow-snapshots
 
   deploy_to_cloud:
-    name: Deploy to Cloud Run
-    runs-on: ubuntu-latest
-    needs: code_quality_checks
-    outputs:
-      artifact_version: ${{ steps.gen_ver.outputs.artifact_version }}
-      service_image_path: ${{ steps.image_version.outputs.service_image_path }}
+    name: Compile for Windows
+    runs-on: windows-latest
+    needs: [ code_quality_checks, versioning ]
     permissions:
       contents: read
-      packages: write
-      id-token: write
     environment: Development
     steps:
       - name: Checkout
@@ -81,8 +76,8 @@ jobs:
         with:
           fetch-depth: 0  # for jgitver to generate the version
 
-#      - name: Set up Docker Buildx
-#        uses: docker/setup-buildx-action@v2
+      #      - name: Set up Docker Buildx
+      #        uses: docker/setup-buildx-action@v2
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -91,121 +86,38 @@ jobs:
           java-version: 17
           cache: maven
 
-      - name: Prepare artifact version
-        id: gen_ver
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Build windows native image
         run: |
-          echo "artifact_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+          mvn -B package -Pnative
 
-      - name: Prepare Docker image tag
-        id: image_version
-        run: |
-          echo "service_image_path=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}:${{ steps.gen_ver.outputs.artifact_version }}" >> $GITHUB_OUTPUT
-
-      - name: Create JVM package
-        run: mvn -B package -P allow-snapshots
-
-      - name: Google Auth
-        id: gcp-auth
-        uses: google-github-actions/auth@v1
-        with:
-          token_format: 'access_token'
-          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
-          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
-
-      - name: Login to Google Docker Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: 'oauth2accesstoken'
-          password: ${{ steps.gcp-auth.outputs.access_token }}
-
-      - name: Check Docker repository
-        id: repository_check
-        continue-on-error: true  # will throw an error if repository does not exist
-        run: |
-          gcloud artifacts repositories describe ${{ env.GHUB_REPO_NAME }} --location ${{ env.REGION }}
-
-      - name: Create Docker repository
-        if: ${{ steps.repository_check.outcome == 'failure' }}  # only create if previous step does not exist
-        run: |
-          gcloud artifacts repositories create ${{ env.GHUB_REPO_NAME }} --repository-format=docker --location ${{ env.REGION }}
-
-#      - name: Extract metadata (tags, labels) for Docker
-#        id: meta
-#        uses: docker/metadata-action@v4
+#      - name: Deploy to cloud run
+#        id: deploy
+#        uses: google-github-actions/deploy-cloudrun@v1
 #        with:
-#          images: ${{ steps.image_version.outputs.service_image_path }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: Dockerfile.dev
-          push: true
-          tags: | # ${{ steps.meta.outputs.tags }} - (For public repositories like docker hub)
-            ${{ steps.image_version.outputs.service_image_path }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Deploy to cloud run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v1
-        with:
-          service: ${{ env.SERVICE }}
-          region: ${{ env.REGION }}
-          image: ${{ steps.image_version.outputs.service_image_path }}
-          project_id: ${{ env.PROJECT_ID }}
-          flags: |
-            --set-env-vars ^##^MONGO_CONN_STRING=${{ secrets.MONGO_CONN_STRING }}
-            --set-env-vars OIDC_CLIENT_ID=${{ secrets.OIDC_CLIENT_ID }}
-            --set-env-vars OIDC_AUTH_URL=${{ secrets.OIDC_AUTH_URL }}
-            --set-env-vars OIDC_SECRET=${{ secrets.OIDC_SECRET }}
-            --set-env-vars FPI_APP_TO_APP_TRUSTED_KEY=${{ secrets.FPI_APP_TO_APP_TRUSTED_KEY }}
-            --set-env-vars DB_NAME=login-api-dev
-            --cpu ${{ env.SERVICE_CPU }}
-            --memory ${{ env.SERVICE_MEMORY }}
-            --timeout 900
-            --no-cpu-throttling
-          labels: |
-            env=${{ env.SERVICE_ENV }}
-
-      - name: Configure cloud run
-        run: |-
-          gcloud run services add-iam-policy-binding ${{ env.SERVICE }} --member=allUsers --role=roles/run.invoker --region=${{ env.REGION }}          
-
-      - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}
-
-  deploy_to_central:
-    name: Release artifact to central
-    runs-on: ubuntu-latest
-    needs: deploy_to_cloud  # only deploy to central if successfully deployed to cloud run environment
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: maven
-          server-id: ossrh
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
-
-      - name: Build and release to central repo
-        env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-        run: mvn -B deploy -Dlib-only -Prelease-for-oss,allow-snapshots
+#          service: ${{ env.SERVICE }}
+#          region: ${{ env.REGION }}
+#          image: ${{ needs.versioning.outputs.service_image_path }}
+#          project_id: ${{ env.PROJECT_ID }}
+#          flags: |
+#            --set-env-vars ^##^MONGO_CONN_STRING=${{ secrets.MONGO_CONN_STRING }}
+#            --set-env-vars OIDC_CLIENT_ID=${{ secrets.OIDC_CLIENT_ID }}
+#            --set-env-vars OIDC_AUTH_URL=${{ secrets.OIDC_AUTH_URL }}
+#            --set-env-vars OIDC_SECRET=${{ secrets.OIDC_SECRET }}
+#            --set-env-vars FPI_APP_TO_APP_TRUSTED_KEY=${{ secrets.FPI_APP_TO_APP_TRUSTED_KEY }}
+#            --set-env-vars DB_NAME=login-api-prod
+#            --cpu ${{ env.SERVICE_CPU }}
+#            --memory ${{ env.SERVICE_MEMORY }}
+#            --cpu-throttling
+#          labels: |
+#            env=${{ env.SERVICE_ENV }}
+#
+#      - name: Configure cloud run
+#        run: |-
+#          gcloud run services add-iam-policy-binding ${{ env.SERVICE }} --member=allUsers --role=roles/run.invoker --region=${{ env.REGION }}
+#
+#      - name: Show Output
+#        run: echo ${{ steps.deploy.outputs.url }}
 
   pr_update:
     name: Pull request update
@@ -245,35 +157,35 @@ jobs:
         with:
           message: |
             ❌ CI Build & Deployment failed, please check the [logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details
-            
-  gcr-cleaner:
-    name: Clean-up old artifact registry images
-    needs: deploy_to_cloud
-    runs-on: 'ubuntu-latest'
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - name: Google Auth
-        id: gcp-auth
-        uses: google-github-actions/auth@v1
-        with:
-          token_format: 'access_token'
-          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
-          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
-
-      - name: Login to Google Docker Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: 'oauth2accesstoken'
-          password: ${{ steps.gcp-auth.outputs.access_token }}
-
-      - name: Run GCR Cleaner
-        uses: docker://us-docker.pkg.dev/gcr-cleaner/gcr-cleaner/gcr-cleaner-cli
-        with:
-          args: >-
-            -repo=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}
-            -tag-filter-any "."
-            -keep=1
-            -recursive=true
+#
+#  gcr-cleaner:
+#    name: Clean-up old artifact registry images
+#    needs: deploy_to_cloud
+#    runs-on: 'ubuntu-latest'
+#    permissions:
+#      contents: read
+#      id-token: write
+#    steps:
+#      - name: Google Auth
+#        id: gcp-auth
+#        uses: google-github-actions/auth@v1
+#        with:
+#          token_format: 'access_token'
+#          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+#          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
+#
+#      - name: Login to Google Docker Registry
+#        uses: docker/login-action@v2
+#        with:
+#          registry: ${{ env.REGISTRY }}
+#          username: 'oauth2accesstoken'
+#          password: ${{ steps.gcp-auth.outputs.access_token }}
+#
+#      - name: Run GCR Cleaner
+#        uses: docker://us-docker.pkg.dev/gcr-cleaner/gcr-cleaner/gcr-cleaner-cli
+#        with:
+#          args: >-
+#            -repo=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.GHUB_REPO_NAME }}/${{ env.SERVICE }}
+#            -tag-filter-any "."
+#            -keep=1
+#            -recursive=true
