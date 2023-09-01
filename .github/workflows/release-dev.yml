@@ -86,6 +86,14 @@ jobs:
           java-version: 17
           cache: maven
 
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '17' # for a specific JDK 17; or '17' for the latest JDK 17
+          distribution: 'graalvm-community' # New 'distribution' option
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: maven
+
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build windows native image
         run: |
