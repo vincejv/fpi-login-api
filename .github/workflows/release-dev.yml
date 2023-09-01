@@ -90,7 +90,7 @@ jobs:
         uses: graalvm/setup-graalvm@v1
         with:
           java-version: '17' # for a specific JDK 17; or '17' for the latest JDK 17
-          distribution: 'graalvm-community' # New 'distribution' option
+          distribution: 'graalvm' # New 'distribution' option
           github-token: ${{ secrets.GITHUB_TOKEN }}
           cache: maven
 
