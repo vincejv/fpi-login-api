@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Approve pull request
         if: ${{ github.actor == env.REPOSITORY_OWNER && contains(github.event.comment.body, format('@{0}', env.REPOSITORY_BOT)) }}
-        uses: hmarr/auto-approve-action@v3
+        uses: hmarr/auto-approve-action@v4
         with:
           pull-request-number: ${{ github.event.issue.number }}
           github-token: ${{ secrets.FPI_BOT_TOKEN }}
